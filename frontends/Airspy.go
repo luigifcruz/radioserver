@@ -33,8 +33,10 @@ func (ic *internalCallback) OnData(dType int, data interface{}) {
 	ic.parent(dType, data)
 }
 
-func CreateAirspyFrontend(serial uint64) Frontend {
-	airspy.Initialize()
+func CreateAirspyFrontend(d *protocol.DeviceInfo) Frontend {
+  var serial uint64
+
+  airspy.Initialize()
 	var f = &AirspyFrontend{
 		device:        airspy.MakeAirspyDevice(serial),
 		deviceSerial:  0,

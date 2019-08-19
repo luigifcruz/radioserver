@@ -29,8 +29,10 @@ type LimeSDRFrontend struct {
 	//selectedAntenna      int
 }
 
-func CreateLimeSDRFrontend(deviceIdx int) Frontend {
-	devices := limedrv.GetDevices()
+func CreateLimeSDRFrontend(d *protocol.DeviceInfo) Frontend {
+  var deviceIdx int
+
+  devices := limedrv.GetDevices()
 	if len(devices) == 0 {
 		limeLog.Fatal("No devices found.\n")
 	}
@@ -51,7 +53,7 @@ func CreateLimeSDRFrontend(deviceIdx int) Frontend {
 	}
 
 	f.deviceSerial = 0
-	f.maxSampleRate = 5000000 //60000000
+	f.maxSampleRate = 3000000 //60000000
 
 	var availableSampleRates = make([]uint32, 1)
 	availableSampleRates[0] = f.maxSampleRate
@@ -86,7 +88,9 @@ func CreateLimeSDRFrontend(deviceIdx int) Frontend {
 		EnableLPF().
 		SetDigitalLPF(float64(f.maxSampleRate) / 2).
 		EnableDigitalLPF().
-		SetAntennaByName("LNAW")
+		SetAntennaByName("LNAW").
+    SetGainNormalized(0.85).
+    SetCenterFrequency(float64(96.9e6))
 
 	f.device.SetGainNormalized(f.selectedChannelIndex, true, 0.2)
 
@@ -118,7 +122,7 @@ func (f *LimeSDRFrontend) MaximumDecimationStages() uint32 {
 }
 
 func (f *LimeSDRFrontend) GetDeviceType() protocol.DeviceType {
-	return protocol.DeviceLimeSDRUSB
+	return protocol.DeviceLimeSDR
 }
 
 func (f *LimeSDRFrontend) GetDeviceSerial() string {
@@ -150,8 +154,8 @@ func (f *LimeSDRFrontend) Start() {
 }
 func (f *LimeSDRFrontend) Stop() {
 	if f.running {
-		limeLog.Info("Stopping")
 		f.device.Stop()
+		limeLog.Info("Stopping")
 		f.running = false
 	}
 }

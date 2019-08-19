@@ -20,7 +20,11 @@ func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceInfo) (*
 	defer rs.sessionLock.Unlock()
 
 	s := GenerateSession(d)
-	rs.sessions[s.ID] = s
+  if s == nil {
+    return nil, fmt.Errorf("error provisioning")
+  }
+
+  rs.sessions[s.ID] = s
 	log.Info("Provisioned %s!", s.ID)
   d.Session = s.ID
 

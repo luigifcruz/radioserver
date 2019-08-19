@@ -132,7 +132,9 @@ func (f *RadioClient) Connect() {
 	ctx := context.Background()
 
 	log.Debug("Connected, provisioning device.")
-	dinf, err := f.client.Provision(ctx, &protocol.DeviceInfo{})
+	dinf, err := f.client.Provision(ctx, &protocol.DeviceInfo{
+    DeviceType: 5,
+  })
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -58,8 +58,7 @@ const (
 	DeviceAirspyOne
 	DeviceAirspyHf
 	DeviceRtlsdr
-	DeviceLimeSDRUSB
-	DeviceLimeSDRMini
+	DeviceLimeSDR
 	DeviceSpyServer
 	DeviceHackRF
 )
@@ -101,8 +100,7 @@ const (
 	DeviceAirspyOneName   = "Airspy Mini / R2"
 	DeviceAirspyHFName    = "Airspy HF / HF+"
 	DeviceRtlsdrName      = "RTLSDR"
-	DeviceLimeSDRUSBName  = "LimeSDR USB"
-	DeviceLimeSDRMiniName = "LimeSDR Mini"
+	DeviceLimeSDRName     = "LimeSDR"
 	DeviceHackRFName      = "HackRF"
 	DeviceSpyserverName   = "SpyServer"
 )
@@ -114,8 +112,7 @@ var DeviceName = map[uint32]string{
 	DeviceAirspyOne:   DeviceAirspyOneName,
 	DeviceAirspyHf:    DeviceAirspyHFName,
 	DeviceRtlsdr:      DeviceRtlsdrName,
-	DeviceLimeSDRUSB:  DeviceLimeSDRUSBName,
-	DeviceLimeSDRMini: DeviceLimeSDRMiniName,
+	DeviceLimeSDR:     DeviceLimeSDRName,
 	DeviceHackRF:      DeviceHackRFName,
 	DeviceSpyServer:   DeviceSpyserverName,
 }

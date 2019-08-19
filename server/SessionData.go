@@ -7,7 +7,6 @@ import (
   "github.com/racerxdl/radioserver/DSP"
 	"github.com/racerxdl/radioserver/protocol"
 	"time"
-  "fmt"
 )
 
 const (
@@ -33,22 +32,17 @@ func GenerateSession(d *protocol.DeviceInfo) *Session {
 
 	CG := DSP.CreateChannelGenerator()
 
-  log.Info("Initializing Frontend")
-  frontend := frontends.CreateLimeSDRFrontend(0)
-  frontend.Init()
-
-  frontend.SetCenterFrequency(96900000)
-  frontend.SetSampleRate(3000000)
-  frontend.SetGain(60)
-  frontend.Start()
-
 	s := &Session{
 		IQFifo:      fifo.NewQueue(),
 		ID:          ID,
 		LastUpdate:  time.Now(),
 		CG:          CG,
 		fullStopped: false,
-	  frontend:    frontend,
+  }
+
+  s.frontend = s.ProvisionFrontend(d)
+  if s.frontend == nil {
+    return nil
   }
 
 	CG.SetOnIQ(func(samples []complex64) {
@@ -56,11 +50,23 @@ func GenerateSession(d *protocol.DeviceInfo) *Session {
 			s.IQFifo.Add(samples)
 		}
 	})
-	CG.Start()
 
-  frontend.SetSamplesAvailableCallback(s.CG.PushSamples)
+	CG.Start()
+  s.frontend.Start()
 
   return s
+}
+
+func (s *Session) ProvisionFrontend(d *protocol.DeviceInfo) frontends.Frontend {
+  constructor := frontends.Available[d.DeviceType.String()]
+  if constructor == nil {
+    return nil
+  }
+
+  f := constructor(d)
+  f.Init()
+  f.SetSamplesAvailableCallback(s.CG.PushSamples)
+  return f
 }
 
 func (s *Session) Expired() bool {

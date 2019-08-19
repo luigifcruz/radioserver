@@ -12,10 +12,9 @@ enum DeviceType {
     DeviceAirspyOne = 2;
     DeviceAirspyHf = 3;
     DeviceRtlsdr = 4;
-    DeviceLimeSDRUSB = 5;
-    DeviceLimeSDRMini = 6;
-    DeviceSpyServer = 7;
-    DeviceHackRF = 8;
+    DeviceLimeSDR = 5;
+    DeviceSpyServer = 6;
+    DeviceHackRF = 7;
 }
 
 message Session {

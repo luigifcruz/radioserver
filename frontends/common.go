@@ -1,6 +1,8 @@
 package frontends
 
-import "github.com/racerxdl/radioserver/protocol"
+import (
+  "github.com/racerxdl/radioserver/protocol"
+)
 
 const (
 	SampleTypeFloatIQ = iota
@@ -40,3 +42,10 @@ type Frontend interface {
 }
 
 type SamplesCallback func(samples []complex64)
+type Frontends map[string]func(*protocol.DeviceInfo) Frontend
+
+var Available = Frontends{
+  "DeviceLimeSDR": CreateLimeSDRFrontend,
+  "DeviceAirspyOne": CreateAirspyFrontend,
+}
+
