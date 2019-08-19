@@ -11,7 +11,6 @@ var log = slog.Scope("RadioClient")
 
 type Callback interface {
 	OnData([]complex64)
-	OnSmartData([]complex64)
 }
 
 type RadioClient struct {
@@ -22,19 +21,14 @@ type RadioClient struct {
 	terminated     bool
 	conn           *grpc.ClientConn
 	client         protocol.RadioServerClient
-	loginData      *protocol.LoginData
 	serverInfo     *protocol.ServerInfoData
 	deviceInfo     *protocol.DeviceInfo
 
 	currentSampleRate      uint32
-	currentSmartSampleRate uint32
 	availableSampleRates   []uint32
 
 	iqChannelConfig      *protocol.ChannelConfig
-	smartIqChannelConfig *protocol.ChannelConfig
-
 	iqChannelEnabled      bool
-	smartIqChannelEnabled bool
 
 	gain      uint32
 	streaming bool
@@ -49,11 +43,10 @@ func MakeRadioClient(address, name, application string) *RadioClient {
 		routineRunning:        false,
 		availableSampleRates:  []uint32{},
 		iqChannelConfig:       &protocol.ChannelConfig{},
-		smartIqChannelConfig:  &protocol.ChannelConfig{},
 		iqChannelEnabled:      false,
-		smartIqChannelEnabled: false,
 		streaming:             false,
-	}
+    currentSampleRate: 3000000,
+  }
 }
 
 // region Public Methods
@@ -90,40 +83,14 @@ func (f *RadioClient) setStreamState() {
 		if f.iqChannelEnabled {
 			go f.iqLoop()
 		}
-		if f.smartIqChannelEnabled {
-			go f.smartIqLoop()
-		}
-	}
-}
-
-func (f *RadioClient) smartIqLoop() {
-	ctx := context.Background()
-	cc := *f.smartIqChannelConfig
-	cc.LoginInfo = f.loginData
-	iqClient, err := f.client.SmartIQ(ctx, &cc)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	for f.smartIqChannelEnabled {
-		data, err := iqClient.Recv()
-		if err != nil {
-			log.Error(err)
-			f.smartIqChannelEnabled = false
-			break
-		}
-		cData := data.GetComplexSamples()
-		if f.cb != nil {
-			f.cb.OnSmartData(cData)
-		}
 	}
 }
 
 func (f *RadioClient) iqLoop() {
 	ctx := context.Background()
-	cc := *f.iqChannelConfig
-	cc.LoginInfo = f.loginData
-	iqClient, err := f.client.IQ(ctx, &cc)
+	iqClient, err := f.client.RXIQ(ctx, &protocol.Session{
+    Token: f.deviceInfo.Session,
+  })
 
 	if err != nil {
 		log.Fatal(err)
@@ -164,31 +131,20 @@ func (f *RadioClient) Connect() {
 	f.client = protocol.NewRadioServerClient(conn)
 	ctx := context.Background()
 
-	log.Debug("Connected, sending hello.")
-	hr, err := f.client.Hello(ctx, &protocol.HelloData{
-		Name:        f.name,
-		Application: f.app,
-	})
-
+	log.Debug("Connected, provisioning device.")
+	dinf, err := f.client.Provision(ctx, &protocol.DeviceInfo{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	f.loginData = hr.Login
 	log.Debug("Fetching server info")
-	sid, err := f.client.ServerInfo(ctx, &protocol.Empty{})
+	sinf, err := f.client.ServerInfo(ctx, &protocol.Empty{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.serverInfo = sid
-	f.deviceInfo = sid.DeviceInfo
 
-	var sampleRates = make([]uint32, f.deviceInfo.MaximumDecimation)
-	for i := uint32(0); i < f.deviceInfo.MaximumDecimation; i++ {
-		var decim = uint32(1 << i)
-		sampleRates[i] = uint32(float32(f.deviceInfo.MaximumSampleRate) / float32(decim))
-	}
-	f.availableSampleRates = sampleRates
+  f.deviceInfo = dinf
+  f.serverInfo = sinf
 }
 
 // Disconnect disconnects from current connected RadioClient.
@@ -196,7 +152,6 @@ func (f *RadioClient) Disconnect() {
 	log.Debug("Disconnecting")
 	f.terminated = true
 	f.iqChannelEnabled = false
-	f.smartIqChannelEnabled = false
 
 	if f.conn != nil {
 		_ = f.conn.Close()
@@ -213,29 +168,8 @@ func (f *RadioClient) GetSampleRate() uint32 {
 // Check the available sample rates using GetAvailableSampleRates
 // Returns Invalid in case of a invalid value in the input
 func (f *RadioClient) SetSampleRate(sampleRate uint32) uint32 {
-	for i := uint32(0); i < f.deviceInfo.MaximumDecimation; i++ {
-		if f.availableSampleRates[i] == sampleRate {
-			f.iqChannelConfig.DecimationStage = i
-			f.currentSampleRate = sampleRate
-			return sampleRate
-		}
-	}
-
-	return protocol.Invalid
-}
-
-// SetDecimationStage sets the sample rate by using the number of decimation stages.
-// Each decimation stage decimates by two, then the total decimation will be defined by 2^stages.
-// This is the same as SetSampleRate, but SetSampleRate instead, looks at a pre-filled table of all 2^stages
-// decimations that the server supports and applies into the original device sample rate.
-func (f *RadioClient) SetDecimationStage(decimation uint32) uint32 {
-	if f.deviceInfo == nil || decimation > f.deviceInfo.MaximumDecimation {
-		return protocol.Invalid
-	}
-	f.iqChannelConfig.DecimationStage = decimation
-	f.currentSampleRate = f.availableSampleRates[decimation]
-
-	return decimation
+  f.currentSampleRate = sampleRate
+	return f.currentSampleRate
 }
 
 // GetCenterFrequency returns the IQ Channel Center Frequency in Hz
@@ -247,34 +181,13 @@ func (f *RadioClient) GetCenterFrequency() uint32 {
 func (f *RadioClient) SetCenterFrequency(centerFrequency uint32) uint32 {
 	if f.iqChannelConfig.CenterFrequency != centerFrequency {
 		f.iqChannelConfig.CenterFrequency = centerFrequency
-		if (f.smartIqChannelEnabled) && f.smartIqChannelConfig.CenterFrequency == 0 {
-			f.SetSmartCenterFrequency(centerFrequency)
-		}
 	}
 
 	return f.iqChannelConfig.CenterFrequency
 }
 
-// GetSmartCenterFrequency returns the Smart IQ Center Frequency in Hertz
-func (f *RadioClient) GetSmartCenterFrequency() uint32 {
-	return f.smartIqChannelConfig.CenterFrequency
-}
-
-// SetSmartCenterFrequency sets the Smart IQ Center Frequency in Hertz and returns it.
-func (f *RadioClient) SetSmartCenterFrequency(centerFrequency uint32) uint32 {
-	if f.smartIqChannelConfig.CenterFrequency != centerFrequency {
-		f.smartIqChannelConfig.CenterFrequency = centerFrequency
-	}
-
-	return f.smartIqChannelConfig.CenterFrequency
-}
-
 func (f *RadioClient) SetIQEnabled(iqEnabled bool) {
 	f.iqChannelEnabled = iqEnabled
-}
-
-func (f *RadioClient) SetSmartIQEnabled(smartIqEnabled bool) {
-	f.smartIqChannelEnabled = smartIqEnabled
 }
 
 // SetCallback sets the callbacks for server data
@@ -285,41 +198,6 @@ func (f *RadioClient) SetCallback(cb Callback) {
 // GetAvailableSampleRates returns a list of available sample rates for the current connection.
 func (f *RadioClient) GetAvailableSampleRates() []uint32 {
 	return f.availableSampleRates
-}
-
-// SetSmartSampleRate sets the sample rate of the SmartIQ Channel in Hertz
-// Check the available sample rates using GetAvailableSampleRates
-// Returns Invalid in case of a invalid value in the input
-func (f *RadioClient) SetSmartSampleRate(sampleRate uint32) uint32 {
-	for i := uint32(0); i < f.deviceInfo.MaximumDecimation; i++ {
-		if f.availableSampleRates[i] == sampleRate {
-			f.smartIqChannelConfig.DecimationStage = i
-			f.currentSmartSampleRate = sampleRate
-			return sampleRate
-		}
-	}
-
-	return protocol.Invalid
-}
-
-// SetSmartDecimation sets the sample rate of the Smart IQ by using the number of decimation stages.
-// Each decimation stage decimates by two, then the total decimation will be defined by 2^stages.
-// This is the same as SetSampleRate, but SetSampleRate instead, looks at a pre-filled table of all 2^stages
-// decimations that the server supports and applies into the original device sample rate.
-// Returns Invalid in case of a invalid value in the input
-func (f *RadioClient) SetSmartDecimation(decimation uint32) uint32 {
-	if f.deviceInfo == nil || decimation > f.deviceInfo.MaximumDecimation {
-		return protocol.Invalid
-	}
-	f.smartIqChannelConfig.DecimationStage = decimation
-	f.currentSmartSampleRate = f.availableSampleRates[decimation]
-
-	return decimation
-}
-
-// GetSmartSampleRate returns the sample rate of Smart IQ in Hertz
-func (f *RadioClient) GetSmartSampleRate() uint32 {
-	return f.currentSmartSampleRate
 }
 
 // SetGain sets the gain stage of the server.

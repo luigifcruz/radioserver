@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/quan-to/slog"
 	"github.com/racerxdl/radioserver"
-	"github.com/racerxdl/radioserver/frontends"
 	"github.com/racerxdl/radioserver/server"
 	"github.com/racerxdl/segdsp/dsp"
 	"os"
@@ -37,24 +36,13 @@ func main() {
 		}
 	}()
 
-	log.Info("Initializing Frontend")
-	//var frontend = frontends.CreateAirspyFrontend(0)
-	var frontend = frontends.CreateLimeSDRFrontend(0)
-	//var frontend = frontends.CreateTestSignalFrontend()
-	frontend.Init()
-	defer frontend.Destroy()
+  serverName := "helium"
 
-	frontend.SetCenterFrequency(106300000)
-	//frontend.SetSampleRate(3000000)
-	//frontend.SetGain(60)
-	frontend.Start()
-
-	defer frontend.Stop()
-
+  log.Info("Server Name: %s", serverName)
 	log.Info("Protocol Version: %s", radioserver.ServerVersion.AsString())
 	log.Info("SIMD Mode: %s", dsp.GetSIMDMode())
 
-	srv := server.MakeRadioServer(frontend)
+	srv := server.MakeRadioServer(serverName)
 	err := srv.Listen(":4050")
 	if err != nil {
 		log.Error("Error listening: %s", err)

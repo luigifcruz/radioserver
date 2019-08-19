@@ -39,28 +39,6 @@ func GetSamples(client protocol.RadioServerClient, stop chan bool) {
 	stop <- true
 }
 
-func PingPongTest(client protocol.RadioServerClient) {
-	ctx := context.Background()
-	sum := uint64(0)
-	for i := 0; i < 64; i++ {
-		tt := uint64(time.Now().UnixNano())
-		pong, err := client.Ping(ctx, &protocol.PingData{
-			Token:     loginInfo.Token,
-			Timestamp: tt,
-		})
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		delta := pong.Timestamp - tt
-		sum += delta
-	}
-
-	sum /= 64
-	log.Info("Average Ping Time: %s", time.Duration(sum))
-}
-
 func main() {
 	flag.Parse()
 	var opts []grpc.DialOption
@@ -76,12 +54,7 @@ func main() {
 
 	ctx := context.Background()
 
-	ret, err := client.Hello(ctx, &protocol.HelloData{
-		Name:        "Lucas Teske",
-		Application: "Radio Client Test",
-		Username:    "",
-		Password:    "",
-	})
+	ret, err := client.Hello(ctx, &protocol.DeviceInfo{})
 
 	if err != nil {
 		log.Fatal(err)
@@ -101,8 +74,6 @@ func main() {
 	serverInfo, _ := json.MarshalIndent(server, "", "   ")
 
 	log.Info("Server Info: %s", serverInfo)
-
-	PingPongTest(client)
 
 	stop := make(chan bool, 1)
 

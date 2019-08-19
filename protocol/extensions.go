@@ -16,7 +16,7 @@ func (m *IQData) GetComplexSamples() []complex64 {
 	return nil
 }
 
-func MakeIQData(channelType ChannelType, samples []complex64) *IQData {
+func MakeIQData(samples []complex64) *IQData {
 	v := make([]float32, len(samples)*2)
 
 	for i, c := range samples {
@@ -28,12 +28,11 @@ func MakeIQData(channelType ChannelType, samples []complex64) *IQData {
 		Timestamp: uint64(time.Now().UnixNano()),
 		Status:    StatusType_OK,
 		Error:     "",
-		Type:      channelType,
 		Samples:   v,
 	}
 }
 
-func MakeIQDataWithPool(channelType ChannelType, samples []complex64, pool sync.Pool) *IQData {
+func MakeIQDataWithPool(samples []complex64, pool sync.Pool) *IQData {
 	v := pool.New().([]float32)
 	if len(v) < len(samples)*2 {
 		v = make([]float32, len(samples)*2)
@@ -51,7 +50,6 @@ func MakeIQDataWithPool(channelType ChannelType, samples []complex64, pool sync.
 		Timestamp: uint64(time.Now().UnixNano()),
 		Status:    StatusType_OK,
 		Error:     "",
-		Type:      channelType,
 		Samples:   v,
 	}
 }

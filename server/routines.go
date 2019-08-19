@@ -22,13 +22,11 @@ func (rs *RadioServer) checkSessions() {
 		return
 	}
 
-	log.Debug("Checking Sessions")
 	rs.sessionLock.Lock()
 	defer rs.sessionLock.Unlock()
 
 	for token, session := range rs.sessions {
 		if session.Expired() {
-			log.Info("Session %s expired.", session.Name)
 			delete(rs.sessions, token)
 			go session.FullStop()
 		}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/quan-to/slog"
 	"github.com/racerxdl/radioserver"
-	"github.com/racerxdl/radioserver/frontends"
 	"github.com/racerxdl/radioserver/protocol"
 	"google.golang.org/grpc"
 	"net"
@@ -21,33 +20,15 @@ type RadioServer struct {
 	sessionLock sync.Mutex
 	grpcServer  *grpc.Server
 
-	frontend frontends.Frontend
-	running  bool
-
-	lastSessionChecks time.Time
+  running bool
+  lastSessionChecks time.Time
 }
 
-func MakeRadioServer(frontend frontends.Frontend) *RadioServer {
+func MakeRadioServer(serverName string) *RadioServer {
 	rs := &RadioServer{
 		serverInfo: &protocol.ServerInfoData{
-			ControlAllowed:           false,
-			ServerCenterFrequency:    0,
-			MinimumIQCenterFrequency: 0,
-			MaximumIQCenterFrequency: 0,
-			MinimumSmartFrequency:    0,
-			MaximumSmartFrequency:    0,
-			DeviceInfo: &protocol.DeviceInfo{
-				DeviceType:        frontend.GetDeviceType(),
-				DeviceSerial:      frontend.GetDeviceSerial(),
-				DeviceName:        frontend.GetName(),
-				MaximumSampleRate: frontend.GetMaximumSampleRate(),
-				MaximumGain:       frontend.MaximumGainValue(),
-				MaximumDecimation: frontend.MaximumDecimationStages(),
-				MinimumFrequency:  frontend.MinimumFrequency(),
-				MaximumFrequency:  frontend.MaximumFrequency(),
-				ADCResolution:     uint32(frontend.GetResolution()),
-			},
-			Version: &protocol.VersionData{
+			Name: serverName,
+      Version: &protocol.Version{
 				Major: uint32(radioserver.ServerVersion.Major),
 				Minor: uint32(radioserver.ServerVersion.Minor),
 				Hash:  radioserver.ServerVersion.Hash,
@@ -55,12 +36,9 @@ func MakeRadioServer(frontend frontends.Frontend) *RadioServer {
 		},
 		sessions:    map[string]*Session{},
 		sessionLock: sync.Mutex{},
-		frontend:    frontend,
 	}
 
-	frontend.SetSamplesAvailableCallback(rs.onSamples)
-
-	return rs
+  return rs
 }
 
 func (rs *RadioServer) Listen(address string) error {

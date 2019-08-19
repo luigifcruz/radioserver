@@ -110,7 +110,7 @@ func (f *LimeSDRFrontend) GetMaximumBandwidth() uint32 {
 }
 
 func (f *LimeSDRFrontend) MaximumGainValue() uint32 {
-	return 32
+	return 60
 }
 
 func (f *LimeSDRFrontend) MaximumDecimationStages() uint32 {
@@ -135,7 +135,8 @@ func (f *LimeSDRFrontend) SetSampleRate(sampleRate uint32) uint32 {
 }
 func (f *LimeSDRFrontend) SetCenterFrequency(centerFrequency uint32) uint32 {
 	f.device.SetCenterFrequency(f.selectedChannelIndex, true, float64(centerFrequency))
-	return uint32(f.device.GetCenterFrequency(f.selectedChannelIndex, true))
+  fmt.Println("SetCenterFrequency Called!")
+  return uint32(f.device.GetCenterFrequency(f.selectedChannelIndex, true))
 }
 func (f *LimeSDRFrontend) GetAvailableSampleRates() []uint32 {
 	return f.availableSampleRates
@@ -155,14 +156,15 @@ func (f *LimeSDRFrontend) Stop() {
 	}
 }
 func (f *LimeSDRFrontend) SetAntenna(value string) {
-	//limeLog.Warn("Airspy Frontend does not support antenna switch. Ignoring...")
+  f.device.SetAntennaByName(value, f.selectedChannelIndex, true)
 }
 func (f *LimeSDRFrontend) SetAGC(agc bool) {
 	//f.device.SetAGC(agc)
 }
 func (f *LimeSDRFrontend) SetGain(value uint8) {
-	caculatedGain := float64(f.MaximumGainValue()) * (float64(value) / 256)
-	f.device.SetGainNormalized(f.selectedChannelIndex, true, caculatedGain)
+	caculatedGain := (1/float64(f.MaximumGainValue())) * float64(value)
+  fmt.Println(caculatedGain)
+  f.device.SetGainNormalized(f.selectedChannelIndex, true, caculatedGain)
 	f.currentGain = value
 }
 func (f *LimeSDRFrontend) GetGain() uint8 {
