@@ -26,7 +26,7 @@ type Session struct {
 	fullStopped bool
 }
 
-func GenerateSession(d *protocol.DeviceInfo) *Session {
+func GenerateSession(d *protocol.DeviceState) *Session {
 	u, _ := uuid2.NewV4()
 	ID := u.String()
 
@@ -57,8 +57,8 @@ func GenerateSession(d *protocol.DeviceInfo) *Session {
   return s
 }
 
-func (s *Session) ProvisionFrontend(d *protocol.DeviceInfo) frontends.Frontend {
-  constructor := frontends.Available[d.DeviceType.String()]
+func (s *Session) ProvisionFrontend(d *protocol.DeviceState) frontends.Frontend {
+  constructor := frontends.Available[d.Info.String()]
   if constructor == nil {
     return nil
   }

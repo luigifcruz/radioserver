@@ -6,15 +6,13 @@ option java_outer_classname = "RadioServerProto";
 
 package protocol;
 
-enum DeviceType {
-    DeviceInvalid = 0;
-    DeviceTestSignal = 1;
-    DeviceAirspyOne = 2;
-    DeviceAirspyHf = 3;
-    DeviceRtlsdr = 4;
-    DeviceLimeSDR = 5;
-    DeviceSpyServer = 6;
-    DeviceHackRF = 7;
+enum DeviceName {
+    TestSignal = 0;
+    AirspyMini = 1;
+    RTLSDR = 2;
+    LimeSDRMini = 3;
+    LimeSDRUSB = 4;
+    HackRF = 5;
 }
 
 message Session {
@@ -22,33 +20,38 @@ message Session {
 }
 
 message DeviceInfo {
-    DeviceType DeviceType = 1;
-    StreamConfig StreamConfig = 2;
-    string Session = 3;
-    string DeviceSerial = 4;
-    string DeviceName = 5;
-    uint32 MaximumSampleRate = 6;
-    uint32 MaximumGain = 7;
-    uint32 MaximumDecimation = 8;
-    uint32 MinimumFrequency = 9;
-    uint32 MaximumFrequency = 10;
-    uint32 ADCResolution = 11;
-    uint32 MaximumRXChannels = 12;
-    uint32 MaximumTXChannels = 13;
+    DeviceName Name = 1;
+    string DeviceSerial = 2;
+    uint32 MaximumSampleRate = 3;
+    uint32 MinimumFrequency = 6;
+    uint32 MaximumFrequency = 7;
+    uint32 ADCResolution = 8;
+    uint32 MaximumRXChannels = 9;
+    uint32 MaximumTXChannels = 10;
 }
 
-message StreamConfig {
-    ChannelConfig RXC = 1;
-    ChannelConfig TXC = 2;
+message DeviceList {
+    repeated DeviceInfo Devices = 1;
+}
+
+message DeviceConfig {
+    float SampleRate = 1;
+    uint32 Oversample = 2;
+    ChannelConfig RXC = 3;
+    ChannelConfig TXC = 4;
+}
+
+message DeviceState {
+    DeviceInfo Info = 1;
+    DeviceConfig Config = 2;
 }
 
 message ChannelConfig {
-    uint32 CenterFrequency = 1;
-    uint32 SampleRate = 2;
-    uint32 Oversample = 3;
-    uint32 NormalizedGain = 4;
-    uint32 AnalogFilterBandwidth = 5;
-    string Antenna = 6;
+    float CenterFrequency = 1;
+    float NormalizedGain = 2;
+    float AnalogFilterBandwidth = 3;
+    float DigitalFilterBandwidth = 4;
+    string Antenna = 5;
 }
 
 enum StatusType {
@@ -67,10 +70,6 @@ message IQData {
 //
 //  Meta
 //
-
-message DeviceList {
-    repeated DeviceInfo Devices = 1;
-}
 
 message Version {
     uint32 Major = 1;
@@ -91,9 +90,9 @@ message Empty {}
 
 service RadioServer {
     rpc List(Empty) returns (DeviceList);
-    rpc Provision(DeviceInfo) returns (DeviceInfo);
+    rpc Provision(DeviceState) returns (Session);
     rpc Destroy(Session) returns (Empty);
     rpc ServerInfo(Empty) returns (ServerInfoData);
-    rpc Tune(StreamConfig) returns (StreamConfig);
+    rpc Tune(DeviceConfig) returns (DeviceConfig);
     rpc RXIQ(Session) returns (stream IQData);
 }

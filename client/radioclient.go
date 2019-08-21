@@ -131,7 +131,15 @@ func (f *RadioClient) Connect() {
 	f.client = protocol.NewRadioServerClient(conn)
 	ctx := context.Background()
 
-	log.Debug("Connected, provisioning device.")
+  log.Debug("Connected, listing devices.")
+	dls, err := f.client.List(ctx, &protocol.Empty{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+  fmt.Println(dls.Devices)
+
+	log.Debug("Provisioning device.")
 	dinf, err := f.client.Provision(ctx, &protocol.DeviceInfo{
     DeviceType: 5,
   })

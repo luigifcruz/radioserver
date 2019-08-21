@@ -24,46 +24,40 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type DeviceType int32
+type DeviceName int32
 
 const (
-	DeviceType_DeviceInvalid    DeviceType = 0
-	DeviceType_DeviceTestSignal DeviceType = 1
-	DeviceType_DeviceAirspyOne  DeviceType = 2
-	DeviceType_DeviceAirspyHf   DeviceType = 3
-	DeviceType_DeviceRtlsdr     DeviceType = 4
-	DeviceType_DeviceLimeSDR    DeviceType = 5
-	DeviceType_DeviceSpyServer  DeviceType = 6
-	DeviceType_DeviceHackRF     DeviceType = 7
+	DeviceName_TestSignal  DeviceName = 0
+	DeviceName_AirspyMini  DeviceName = 1
+	DeviceName_RTLSDR      DeviceName = 2
+	DeviceName_LimeSDRMini DeviceName = 3
+	DeviceName_LimeSDRUSB  DeviceName = 4
+	DeviceName_HackRF      DeviceName = 5
 )
 
-var DeviceType_name = map[int32]string{
-	0: "DeviceInvalid",
-	1: "DeviceTestSignal",
-	2: "DeviceAirspyOne",
-	3: "DeviceAirspyHf",
-	4: "DeviceRtlsdr",
-	5: "DeviceLimeSDR",
-	6: "DeviceSpyServer",
-	7: "DeviceHackRF",
+var DeviceName_name = map[int32]string{
+	0: "TestSignal",
+	1: "AirspyMini",
+	2: "RTLSDR",
+	3: "LimeSDRMini",
+	4: "LimeSDRUSB",
+	5: "HackRF",
 }
 
-var DeviceType_value = map[string]int32{
-	"DeviceInvalid":    0,
-	"DeviceTestSignal": 1,
-	"DeviceAirspyOne":  2,
-	"DeviceAirspyHf":   3,
-	"DeviceRtlsdr":     4,
-	"DeviceLimeSDR":    5,
-	"DeviceSpyServer":  6,
-	"DeviceHackRF":     7,
+var DeviceName_value = map[string]int32{
+	"TestSignal":  0,
+	"AirspyMini":  1,
+	"RTLSDR":      2,
+	"LimeSDRMini": 3,
+	"LimeSDRUSB":  4,
+	"HackRF":      5,
 }
 
-func (x DeviceType) String() string {
-	return proto.EnumName(DeviceType_name, int32(x))
+func (x DeviceName) String() string {
+	return proto.EnumName(DeviceName_name, int32(x))
 }
 
-func (DeviceType) EnumDescriptor() ([]byte, []int) {
+func (DeviceName) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_ad098daeda4239f7, []int{0}
 }
 
@@ -135,22 +129,19 @@ func (m *Session) GetToken() string {
 }
 
 type DeviceInfo struct {
-	DeviceType           DeviceType    `protobuf:"varint,1,opt,name=DeviceType,proto3,enum=protocol.DeviceType" json:"DeviceType,omitempty"`
-	StreamConfig         *StreamConfig `protobuf:"bytes,2,opt,name=StreamConfig,proto3" json:"StreamConfig,omitempty"`
-	Session              string        `protobuf:"bytes,3,opt,name=Session,proto3" json:"Session,omitempty"`
-	DeviceSerial         string        `protobuf:"bytes,4,opt,name=DeviceSerial,proto3" json:"DeviceSerial,omitempty"`
-	DeviceName           string        `protobuf:"bytes,5,opt,name=DeviceName,proto3" json:"DeviceName,omitempty"`
-	MaximumSampleRate    uint32        `protobuf:"varint,6,opt,name=MaximumSampleRate,proto3" json:"MaximumSampleRate,omitempty"`
-	MaximumGain          uint32        `protobuf:"varint,7,opt,name=MaximumGain,proto3" json:"MaximumGain,omitempty"`
-	MaximumDecimation    uint32        `protobuf:"varint,8,opt,name=MaximumDecimation,proto3" json:"MaximumDecimation,omitempty"`
-	MinimumFrequency     uint32        `protobuf:"varint,9,opt,name=MinimumFrequency,proto3" json:"MinimumFrequency,omitempty"`
-	MaximumFrequency     uint32        `protobuf:"varint,10,opt,name=MaximumFrequency,proto3" json:"MaximumFrequency,omitempty"`
-	ADCResolution        uint32        `protobuf:"varint,11,opt,name=ADCResolution,proto3" json:"ADCResolution,omitempty"`
-	MaximumRXChannels    uint32        `protobuf:"varint,12,opt,name=MaximumRXChannels,proto3" json:"MaximumRXChannels,omitempty"`
-	MaximumTXChannels    uint32        `protobuf:"varint,13,opt,name=MaximumTXChannels,proto3" json:"MaximumTXChannels,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	Name                 DeviceName `protobuf:"varint,1,opt,name=Name,proto3,enum=protocol.DeviceName" json:"Name,omitempty"`
+	DeviceSerial         string     `protobuf:"bytes,2,opt,name=DeviceSerial,proto3" json:"DeviceSerial,omitempty"`
+	MaximumSampleRate    uint32     `protobuf:"varint,3,opt,name=MaximumSampleRate,proto3" json:"MaximumSampleRate,omitempty"`
+	MaximumGain          uint32     `protobuf:"varint,4,opt,name=MaximumGain,proto3" json:"MaximumGain,omitempty"`
+	MaximumDecimation    uint32     `protobuf:"varint,5,opt,name=MaximumDecimation,proto3" json:"MaximumDecimation,omitempty"`
+	MinimumFrequency     uint32     `protobuf:"varint,6,opt,name=MinimumFrequency,proto3" json:"MinimumFrequency,omitempty"`
+	MaximumFrequency     uint32     `protobuf:"varint,7,opt,name=MaximumFrequency,proto3" json:"MaximumFrequency,omitempty"`
+	ADCResolution        uint32     `protobuf:"varint,8,opt,name=ADCResolution,proto3" json:"ADCResolution,omitempty"`
+	MaximumRXChannels    uint32     `protobuf:"varint,9,opt,name=MaximumRXChannels,proto3" json:"MaximumRXChannels,omitempty"`
+	MaximumTXChannels    uint32     `protobuf:"varint,10,opt,name=MaximumTXChannels,proto3" json:"MaximumTXChannels,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
 }
 
 func (m *DeviceInfo) Reset()         { *m = DeviceInfo{} }
@@ -178,37 +169,16 @@ func (m *DeviceInfo) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeviceInfo proto.InternalMessageInfo
 
-func (m *DeviceInfo) GetDeviceType() DeviceType {
+func (m *DeviceInfo) GetName() DeviceName {
 	if m != nil {
-		return m.DeviceType
+		return m.Name
 	}
-	return DeviceType_DeviceInvalid
-}
-
-func (m *DeviceInfo) GetStreamConfig() *StreamConfig {
-	if m != nil {
-		return m.StreamConfig
-	}
-	return nil
-}
-
-func (m *DeviceInfo) GetSession() string {
-	if m != nil {
-		return m.Session
-	}
-	return ""
+	return DeviceName_TestSignal
 }
 
 func (m *DeviceInfo) GetDeviceSerial() string {
 	if m != nil {
 		return m.DeviceSerial
-	}
-	return ""
-}
-
-func (m *DeviceInfo) GetDeviceName() string {
-	if m != nil {
-		return m.DeviceName
 	}
 	return ""
 }
@@ -269,70 +239,171 @@ func (m *DeviceInfo) GetMaximumTXChannels() uint32 {
 	return 0
 }
 
-type StreamConfig struct {
-	RXC                  *ChannelConfig `protobuf:"bytes,1,opt,name=RXC,proto3" json:"RXC,omitempty"`
-	TXC                  *ChannelConfig `protobuf:"bytes,2,opt,name=TXC,proto3" json:"TXC,omitempty"`
+type DeviceList struct {
+	Devices              []*DeviceInfo `protobuf:"bytes,1,rep,name=Devices,proto3" json:"Devices,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *DeviceList) Reset()         { *m = DeviceList{} }
+func (m *DeviceList) String() string { return proto.CompactTextString(m) }
+func (*DeviceList) ProtoMessage()    {}
+func (*DeviceList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ad098daeda4239f7, []int{2}
+}
+
+func (m *DeviceList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeviceList.Unmarshal(m, b)
+}
+func (m *DeviceList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeviceList.Marshal(b, m, deterministic)
+}
+func (m *DeviceList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeviceList.Merge(m, src)
+}
+func (m *DeviceList) XXX_Size() int {
+	return xxx_messageInfo_DeviceList.Size(m)
+}
+func (m *DeviceList) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeviceList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeviceList proto.InternalMessageInfo
+
+func (m *DeviceList) GetDevices() []*DeviceInfo {
+	if m != nil {
+		return m.Devices
+	}
+	return nil
+}
+
+type DeviceConfig struct {
+	SampleRate           float32        `protobuf:"fixed32,1,opt,name=SampleRate,proto3" json:"SampleRate,omitempty"`
+	Oversample           uint32         `protobuf:"varint,2,opt,name=Oversample,proto3" json:"Oversample,omitempty"`
+	RXC                  *ChannelConfig `protobuf:"bytes,3,opt,name=RXC,proto3" json:"RXC,omitempty"`
+	TXC                  *ChannelConfig `protobuf:"bytes,4,opt,name=TXC,proto3" json:"TXC,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
 }
 
-func (m *StreamConfig) Reset()         { *m = StreamConfig{} }
-func (m *StreamConfig) String() string { return proto.CompactTextString(m) }
-func (*StreamConfig) ProtoMessage()    {}
-func (*StreamConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{2}
+func (m *DeviceConfig) Reset()         { *m = DeviceConfig{} }
+func (m *DeviceConfig) String() string { return proto.CompactTextString(m) }
+func (*DeviceConfig) ProtoMessage()    {}
+func (*DeviceConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ad098daeda4239f7, []int{3}
 }
 
-func (m *StreamConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_StreamConfig.Unmarshal(m, b)
+func (m *DeviceConfig) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeviceConfig.Unmarshal(m, b)
 }
-func (m *StreamConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_StreamConfig.Marshal(b, m, deterministic)
+func (m *DeviceConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeviceConfig.Marshal(b, m, deterministic)
 }
-func (m *StreamConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StreamConfig.Merge(m, src)
+func (m *DeviceConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeviceConfig.Merge(m, src)
 }
-func (m *StreamConfig) XXX_Size() int {
-	return xxx_messageInfo_StreamConfig.Size(m)
+func (m *DeviceConfig) XXX_Size() int {
+	return xxx_messageInfo_DeviceConfig.Size(m)
 }
-func (m *StreamConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_StreamConfig.DiscardUnknown(m)
+func (m *DeviceConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeviceConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_StreamConfig proto.InternalMessageInfo
+var xxx_messageInfo_DeviceConfig proto.InternalMessageInfo
 
-func (m *StreamConfig) GetRXC() *ChannelConfig {
+func (m *DeviceConfig) GetSampleRate() float32 {
+	if m != nil {
+		return m.SampleRate
+	}
+	return 0
+}
+
+func (m *DeviceConfig) GetOversample() uint32 {
+	if m != nil {
+		return m.Oversample
+	}
+	return 0
+}
+
+func (m *DeviceConfig) GetRXC() *ChannelConfig {
 	if m != nil {
 		return m.RXC
 	}
 	return nil
 }
 
-func (m *StreamConfig) GetTXC() *ChannelConfig {
+func (m *DeviceConfig) GetTXC() *ChannelConfig {
 	if m != nil {
 		return m.TXC
 	}
 	return nil
 }
 
+type DeviceState struct {
+	Info                 *DeviceInfo   `protobuf:"bytes,1,opt,name=Info,proto3" json:"Info,omitempty"`
+	Config               *DeviceConfig `protobuf:"bytes,2,opt,name=Config,proto3" json:"Config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *DeviceState) Reset()         { *m = DeviceState{} }
+func (m *DeviceState) String() string { return proto.CompactTextString(m) }
+func (*DeviceState) ProtoMessage()    {}
+func (*DeviceState) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ad098daeda4239f7, []int{4}
+}
+
+func (m *DeviceState) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeviceState.Unmarshal(m, b)
+}
+func (m *DeviceState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeviceState.Marshal(b, m, deterministic)
+}
+func (m *DeviceState) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeviceState.Merge(m, src)
+}
+func (m *DeviceState) XXX_Size() int {
+	return xxx_messageInfo_DeviceState.Size(m)
+}
+func (m *DeviceState) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeviceState.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeviceState proto.InternalMessageInfo
+
+func (m *DeviceState) GetInfo() *DeviceInfo {
+	if m != nil {
+		return m.Info
+	}
+	return nil
+}
+
+func (m *DeviceState) GetConfig() *DeviceConfig {
+	if m != nil {
+		return m.Config
+	}
+	return nil
+}
+
 type ChannelConfig struct {
-	CenterFrequency       uint32   `protobuf:"varint,1,opt,name=CenterFrequency,proto3" json:"CenterFrequency,omitempty"`
-	SampleRate            uint32   `protobuf:"varint,2,opt,name=SampleRate,proto3" json:"SampleRate,omitempty"`
-	Oversample            uint32   `protobuf:"varint,3,opt,name=Oversample,proto3" json:"Oversample,omitempty"`
-	NormalizedGain        uint32   `protobuf:"varint,4,opt,name=NormalizedGain,proto3" json:"NormalizedGain,omitempty"`
-	AnalogFilterBandwidth uint32   `protobuf:"varint,5,opt,name=AnalogFilterBandwidth,proto3" json:"AnalogFilterBandwidth,omitempty"`
-	Antenna               string   `protobuf:"bytes,6,opt,name=Antenna,proto3" json:"Antenna,omitempty"`
-	XXX_NoUnkeyedLiteral  struct{} `json:"-"`
-	XXX_unrecognized      []byte   `json:"-"`
-	XXX_sizecache         int32    `json:"-"`
+	CenterFrequency        float32  `protobuf:"fixed32,1,opt,name=CenterFrequency,proto3" json:"CenterFrequency,omitempty"`
+	NormalizedGain         float32  `protobuf:"fixed32,2,opt,name=NormalizedGain,proto3" json:"NormalizedGain,omitempty"`
+	AnalogFilterBandwidth  float32  `protobuf:"fixed32,3,opt,name=AnalogFilterBandwidth,proto3" json:"AnalogFilterBandwidth,omitempty"`
+	DigitalFilterBandwidth float32  `protobuf:"fixed32,4,opt,name=DigitalFilterBandwidth,proto3" json:"DigitalFilterBandwidth,omitempty"`
+	Antenna                string   `protobuf:"bytes,5,opt,name=Antenna,proto3" json:"Antenna,omitempty"`
+	XXX_NoUnkeyedLiteral   struct{} `json:"-"`
+	XXX_unrecognized       []byte   `json:"-"`
+	XXX_sizecache          int32    `json:"-"`
 }
 
 func (m *ChannelConfig) Reset()         { *m = ChannelConfig{} }
 func (m *ChannelConfig) String() string { return proto.CompactTextString(m) }
 func (*ChannelConfig) ProtoMessage()    {}
 func (*ChannelConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{3}
+	return fileDescriptor_ad098daeda4239f7, []int{5}
 }
 
 func (m *ChannelConfig) XXX_Unmarshal(b []byte) error {
@@ -353,37 +424,30 @@ func (m *ChannelConfig) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ChannelConfig proto.InternalMessageInfo
 
-func (m *ChannelConfig) GetCenterFrequency() uint32 {
+func (m *ChannelConfig) GetCenterFrequency() float32 {
 	if m != nil {
 		return m.CenterFrequency
 	}
 	return 0
 }
 
-func (m *ChannelConfig) GetSampleRate() uint32 {
-	if m != nil {
-		return m.SampleRate
-	}
-	return 0
-}
-
-func (m *ChannelConfig) GetOversample() uint32 {
-	if m != nil {
-		return m.Oversample
-	}
-	return 0
-}
-
-func (m *ChannelConfig) GetNormalizedGain() uint32 {
+func (m *ChannelConfig) GetNormalizedGain() float32 {
 	if m != nil {
 		return m.NormalizedGain
 	}
 	return 0
 }
 
-func (m *ChannelConfig) GetAnalogFilterBandwidth() uint32 {
+func (m *ChannelConfig) GetAnalogFilterBandwidth() float32 {
 	if m != nil {
 		return m.AnalogFilterBandwidth
+	}
+	return 0
+}
+
+func (m *ChannelConfig) GetDigitalFilterBandwidth() float32 {
+	if m != nil {
+		return m.DigitalFilterBandwidth
 	}
 	return 0
 }
@@ -409,7 +473,7 @@ func (m *IQData) Reset()         { *m = IQData{} }
 func (m *IQData) String() string { return proto.CompactTextString(m) }
 func (*IQData) ProtoMessage()    {}
 func (*IQData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{4}
+	return fileDescriptor_ad098daeda4239f7, []int{6}
 }
 
 func (m *IQData) XXX_Unmarshal(b []byte) error {
@@ -458,45 +522,6 @@ func (m *IQData) GetError() string {
 	return ""
 }
 
-type DeviceList struct {
-	Devices              []*DeviceInfo `protobuf:"bytes,1,rep,name=Devices,proto3" json:"Devices,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
-}
-
-func (m *DeviceList) Reset()         { *m = DeviceList{} }
-func (m *DeviceList) String() string { return proto.CompactTextString(m) }
-func (*DeviceList) ProtoMessage()    {}
-func (*DeviceList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{5}
-}
-
-func (m *DeviceList) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeviceList.Unmarshal(m, b)
-}
-func (m *DeviceList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeviceList.Marshal(b, m, deterministic)
-}
-func (m *DeviceList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeviceList.Merge(m, src)
-}
-func (m *DeviceList) XXX_Size() int {
-	return xxx_messageInfo_DeviceList.Size(m)
-}
-func (m *DeviceList) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeviceList.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeviceList proto.InternalMessageInfo
-
-func (m *DeviceList) GetDevices() []*DeviceInfo {
-	if m != nil {
-		return m.Devices
-	}
-	return nil
-}
-
 type Version struct {
 	Major                uint32   `protobuf:"varint,1,opt,name=Major,proto3" json:"Major,omitempty"`
 	Minor                uint32   `protobuf:"varint,2,opt,name=Minor,proto3" json:"Minor,omitempty"`
@@ -510,7 +535,7 @@ func (m *Version) Reset()         { *m = Version{} }
 func (m *Version) String() string { return proto.CompactTextString(m) }
 func (*Version) ProtoMessage()    {}
 func (*Version) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{6}
+	return fileDescriptor_ad098daeda4239f7, []int{7}
 }
 
 func (m *Version) XXX_Unmarshal(b []byte) error {
@@ -564,7 +589,7 @@ func (m *ServerInfoData) Reset()         { *m = ServerInfoData{} }
 func (m *ServerInfoData) String() string { return proto.CompactTextString(m) }
 func (*ServerInfoData) ProtoMessage()    {}
 func (*ServerInfoData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{7}
+	return fileDescriptor_ad098daeda4239f7, []int{8}
 }
 
 func (m *ServerInfoData) XXX_Unmarshal(b []byte) error {
@@ -609,7 +634,7 @@ func (m *Empty) Reset()         { *m = Empty{} }
 func (m *Empty) String() string { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()    {}
 func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ad098daeda4239f7, []int{8}
+	return fileDescriptor_ad098daeda4239f7, []int{9}
 }
 
 func (m *Empty) XXX_Unmarshal(b []byte) error {
@@ -631,14 +656,15 @@ func (m *Empty) XXX_DiscardUnknown() {
 var xxx_messageInfo_Empty proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterEnum("protocol.DeviceType", DeviceType_name, DeviceType_value)
+	proto.RegisterEnum("protocol.DeviceName", DeviceName_name, DeviceName_value)
 	proto.RegisterEnum("protocol.StatusType", StatusType_name, StatusType_value)
 	proto.RegisterType((*Session)(nil), "protocol.Session")
 	proto.RegisterType((*DeviceInfo)(nil), "protocol.DeviceInfo")
-	proto.RegisterType((*StreamConfig)(nil), "protocol.StreamConfig")
+	proto.RegisterType((*DeviceList)(nil), "protocol.DeviceList")
+	proto.RegisterType((*DeviceConfig)(nil), "protocol.DeviceConfig")
+	proto.RegisterType((*DeviceState)(nil), "protocol.DeviceState")
 	proto.RegisterType((*ChannelConfig)(nil), "protocol.ChannelConfig")
 	proto.RegisterType((*IQData)(nil), "protocol.IQData")
-	proto.RegisterType((*DeviceList)(nil), "protocol.DeviceList")
 	proto.RegisterType((*Version)(nil), "protocol.Version")
 	proto.RegisterType((*ServerInfoData)(nil), "protocol.ServerInfoData")
 	proto.RegisterType((*Empty)(nil), "protocol.Empty")
@@ -647,61 +673,61 @@ func init() {
 func init() { proto.RegisterFile("server.proto", fileDescriptor_ad098daeda4239f7) }
 
 var fileDescriptor_ad098daeda4239f7 = []byte{
-	// 852 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x55, 0x51, 0x6f, 0xe3, 0x44,
-	0x10, 0xc6, 0x89, 0x9b, 0x5c, 0x26, 0x4d, 0xcf, 0x9d, 0x2b, 0x60, 0x55, 0x08, 0x22, 0x0b, 0xa1,
-	0x5c, 0xe9, 0x45, 0xa8, 0x9c, 0x38, 0x09, 0xf1, 0xd2, 0x26, 0x57, 0x5a, 0x71, 0xbd, 0xb6, 0xeb,
-	0x08, 0xe5, 0x75, 0x49, 0xb6, 0xed, 0x72, 0xf6, 0x3a, 0xac, 0x37, 0x81, 0xf0, 0xcc, 0xaf, 0xe1,
-	0x99, 0x9f, 0xc0, 0x1f, 0xe2, 0x1f, 0x20, 0x8f, 0xed, 0xae, 0xdd, 0xb4, 0x4f, 0xc9, 0x7c, 0xf3,
-	0xed, 0xec, 0xec, 0x7c, 0x33, 0x63, 0xd8, 0x4e, 0x85, 0x5e, 0x09, 0x3d, 0x5c, 0xe8, 0xc4, 0x24,
-	0xf8, 0x8c, 0x7e, 0x66, 0x49, 0x14, 0x7c, 0x01, 0xed, 0x50, 0xa4, 0xa9, 0x4c, 0x14, 0xee, 0xc1,
-	0xd6, 0x24, 0xf9, 0x20, 0x94, 0xef, 0xf4, 0x9d, 0x41, 0x87, 0xe5, 0x46, 0xf0, 0x8f, 0x0b, 0x30,
-	0x16, 0x2b, 0x39, 0x13, 0xe7, 0xea, 0x26, 0xc1, 0xd7, 0xa5, 0x35, 0x59, 0x2f, 0x04, 0x31, 0x77,
-	0x8e, 0xf6, 0x86, 0x65, 0xb8, 0xa1, 0xf5, 0xb1, 0x0a, 0x0f, 0xbf, 0x87, 0xed, 0xd0, 0x68, 0xc1,
-	0xe3, 0x51, 0xa2, 0x6e, 0xe4, 0xad, 0xdf, 0xe8, 0x3b, 0x83, 0xee, 0xd1, 0x27, 0xf6, 0x5c, 0xd5,
-	0xcb, 0x6a, 0x5c, 0xf4, 0xef, 0x33, 0xf4, 0x9b, 0x94, 0xd8, 0x7d, 0xc2, 0x01, 0x6c, 0xe7, 0x77,
-	0x84, 0x42, 0x4b, 0x1e, 0xf9, 0x2e, 0xb9, 0x6b, 0x18, 0x7e, 0x5e, 0xe6, 0xfb, 0x9e, 0xc7, 0xc2,
-	0xdf, 0x22, 0x46, 0x05, 0xc1, 0x43, 0xd8, 0xbd, 0xe0, 0x7f, 0xc8, 0x78, 0x19, 0x87, 0x3c, 0x5e,
-	0x44, 0x82, 0x71, 0x23, 0xfc, 0x56, 0xdf, 0x19, 0xf4, 0xd8, 0xa6, 0x03, 0xfb, 0xd0, 0x2d, 0xc0,
-	0x1f, 0xb9, 0x54, 0x7e, 0x9b, 0x78, 0x55, 0xa8, 0x12, 0x6f, 0x2c, 0x66, 0x32, 0xe6, 0x26, 0xcb,
-	0xfb, 0x59, 0x2d, 0x9e, 0x75, 0xe0, 0x01, 0x78, 0x17, 0x52, 0x65, 0xe0, 0xa9, 0x16, 0xbf, 0x2d,
-	0x85, 0x9a, 0xad, 0xfd, 0x0e, 0x91, 0x37, 0x70, 0xe2, 0xe6, 0x01, 0x2c, 0x17, 0x0a, 0xee, 0x03,
-	0x1c, 0xbf, 0x84, 0xde, 0xf1, 0x78, 0xc4, 0x44, 0x9a, 0x44, 0x4b, 0xca, 0xa0, 0x4b, 0xc4, 0x3a,
-	0x58, 0xc9, 0x95, 0x4d, 0x47, 0x77, 0x5c, 0x29, 0x11, 0xa5, 0xfe, 0x76, 0x2d, 0x57, 0xeb, 0xa8,
-	0xb0, 0x27, 0x96, 0xdd, 0xab, 0xb1, 0xad, 0x23, 0x98, 0xd7, 0x15, 0xc7, 0x97, 0xd0, 0x64, 0xd3,
-	0x11, 0x35, 0x4c, 0xf7, 0xe8, 0x53, 0x2b, 0x7c, 0x71, 0xa0, 0x50, 0x3e, 0xe3, 0x64, 0xd4, 0xc9,
-	0x74, 0x54, 0xf4, 0xc8, 0xd3, 0xd4, 0xc9, 0x74, 0x14, 0xfc, 0xe7, 0x40, 0xaf, 0x06, 0xe3, 0x00,
-	0x9e, 0x8f, 0x84, 0x32, 0x42, 0xdb, 0x22, 0x39, 0x94, 0xe3, 0x43, 0x38, 0xeb, 0x8c, 0x8a, 0xe4,
-	0x0d, 0x22, 0x55, 0x90, 0xcc, 0x7f, 0xb9, 0x12, 0x3a, 0x25, 0x84, 0x5a, 0xaf, 0xc7, 0x2a, 0x08,
-	0x7e, 0x05, 0x3b, 0xef, 0x13, 0x1d, 0xf3, 0x48, 0xfe, 0x29, 0xe6, 0xd4, 0x0e, 0x2e, 0x71, 0x1e,
-	0xa0, 0xf8, 0x1a, 0x3e, 0x3e, 0x56, 0x3c, 0x4a, 0x6e, 0x4f, 0x65, 0x64, 0x84, 0x3e, 0xe1, 0x6a,
-	0xfe, 0xbb, 0x9c, 0x9b, 0x3b, 0x6a, 0xc6, 0x1e, 0x7b, 0xdc, 0x99, 0x75, 0xfd, 0xb1, 0x32, 0x42,
-	0x29, 0x4e, 0xdd, 0xd8, 0x61, 0xa5, 0x19, 0xfc, 0xe5, 0x40, 0xeb, 0xfc, 0x7a, 0xcc, 0x0d, 0xc7,
-	0xcf, 0xa0, 0x33, 0x91, 0xb1, 0x48, 0x0d, 0x8f, 0x17, 0xf4, 0x4c, 0x97, 0x59, 0x00, 0x0f, 0xa1,
-	0x95, 0x1a, 0x6e, 0x96, 0x29, 0x3d, 0xae, 0x36, 0xa6, 0x21, 0xe1, 0x34, 0xa6, 0x05, 0x87, 0xc6,
-	0x8c, 0x1e, 0x96, 0xfa, 0x6e, 0xbf, 0x39, 0x68, 0xb0, 0xd2, 0xcc, 0xf6, 0xc2, 0x5b, 0xad, 0x13,
-	0x5d, 0x8c, 0x5f, 0x6e, 0x04, 0x3f, 0x94, 0x83, 0xf5, 0x4e, 0xa6, 0x06, 0x87, 0xd0, 0xce, 0xad,
-	0xd4, 0x77, 0xfa, 0xcd, 0x41, 0x77, 0x73, 0x27, 0x64, 0xdb, 0x83, 0x95, 0xa4, 0xe0, 0x1c, 0xda,
-	0x3f, 0x0b, 0x5d, 0xae, 0x9d, 0x0b, 0xfe, 0x6b, 0xa2, 0x0b, 0x9d, 0x72, 0x83, 0x50, 0xa9, 0x12,
-	0x5d, 0x08, 0x93, 0x1b, 0x88, 0xe0, 0x9e, 0xf1, 0xf4, 0xae, 0x50, 0x83, 0xfe, 0x07, 0xd7, 0xb0,
-	0x13, 0xd2, 0x6e, 0xcb, 0x6e, 0xa0, 0xb2, 0x20, 0xb8, 0x34, 0xed, 0xf9, 0x1e, 0xa3, 0xff, 0xf8,
-	0xf5, 0xfd, 0x85, 0x45, 0x63, 0xed, 0xda, 0x04, 0x0b, 0x07, 0x2b, 0x19, 0x41, 0x1b, 0xb6, 0xde,
-	0xc6, 0x0b, 0xb3, 0x3e, 0xf8, 0xdb, 0xa9, 0xae, 0x3b, 0xdc, 0x85, 0x5e, 0xf9, 0x98, 0x15, 0x8f,
-	0xe4, 0xdc, 0xfb, 0x08, 0xf7, 0xc0, 0x2b, 0x08, 0x22, 0x35, 0xa1, 0xbc, 0x55, 0x3c, 0xf2, 0x1c,
-	0x7c, 0x01, 0xcf, 0x73, 0xf4, 0x58, 0xea, 0x74, 0xb1, 0xbe, 0x54, 0xc2, 0x6b, 0x20, 0xc2, 0x4e,
-	0x15, 0x3c, 0xbb, 0xf1, 0x9a, 0xe8, 0x95, 0x2b, 0x8c, 0x99, 0x28, 0x9d, 0x6b, 0xcf, 0xb5, 0x77,
-	0xbc, 0x93, 0xb1, 0x08, 0xc7, 0xcc, 0xdb, 0xb2, 0xd1, 0xc2, 0xc5, 0x3a, 0x7f, 0xaa, 0xd7, 0xb2,
-	0x27, 0xcf, 0xf8, 0xec, 0x03, 0x3b, 0xf5, 0xda, 0x07, 0x87, 0x00, 0x56, 0x57, 0xec, 0x42, 0xdb,
-	0x66, 0xd9, 0x82, 0xc6, 0xe5, 0x4f, 0x9e, 0x83, 0x9d, 0x42, 0x4a, 0xaf, 0x71, 0xf4, 0x6f, 0x03,
-	0xba, 0x8c, 0xcf, 0x65, 0x92, 0x47, 0xc4, 0x57, 0xe0, 0x92, 0x92, 0xcf, 0x6d, 0x5d, 0xa8, 0x06,
-	0xfb, 0x1b, 0x4a, 0x12, 0xed, 0x0d, 0x74, 0xae, 0x74, 0xb2, 0x92, 0xb9, 0x84, 0x8f, 0x89, 0xbd,
-	0xff, 0x28, 0x8a, 0xaf, 0xb2, 0x4e, 0x49, 0x8d, 0x4e, 0xd6, 0x58, 0x91, 0xa0, 0x58, 0xe9, 0xfb,
-	0x0f, 0x6f, 0xc7, 0x37, 0x00, 0x56, 0xdd, 0xcd, 0xe4, 0xfc, 0x6a, 0x88, 0x5a, 0x13, 0x7c, 0x07,
-	0xee, 0x64, 0xa9, 0x04, 0x3e, 0xf1, 0x91, 0xd9, 0x7f, 0x02, 0xcf, 0xea, 0xc0, 0xa6, 0xe7, 0xd7,
-	0x8f, 0x25, 0xe7, 0x59, 0x28, 0x1f, 0xc0, 0x6f, 0x9c, 0x93, 0x97, 0xf0, 0x42, 0x26, 0xc3, 0x5b,
-	0xbd, 0x98, 0x0d, 0x75, 0x56, 0xcd, 0xfc, 0x33, 0x7b, 0xe2, 0x55, 0x4a, 0x7b, 0x95, 0x1d, 0xba,
-	0x72, 0x7e, 0x69, 0xd1, 0xe9, 0x6f, 0xff, 0x0f, 0x00, 0x00, 0xff, 0xff, 0x32, 0x5e, 0x5f, 0xb0,
-	0x8b, 0x07, 0x00, 0x00,
+	// 851 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x55, 0xe1, 0x72, 0xdb, 0x44,
+	0x10, 0xae, 0x64, 0xc5, 0xae, 0xd7, 0x75, 0xa2, 0x1e, 0x6d, 0xd1, 0x64, 0x18, 0xf0, 0x68, 0x18,
+	0xc6, 0x0d, 0xa9, 0x87, 0x09, 0x50, 0xfe, 0xf0, 0x27, 0xb1, 0x1b, 0xea, 0x21, 0x69, 0x93, 0x93,
+	0x60, 0xfc, 0xf7, 0xb0, 0xaf, 0xce, 0x51, 0xe9, 0xce, 0x9c, 0xce, 0x06, 0xf3, 0x9b, 0x47, 0xe1,
+	0x09, 0x78, 0x04, 0xde, 0x86, 0xb7, 0x60, 0x6e, 0x25, 0x21, 0xd9, 0x8e, 0xf9, 0x65, 0xef, 0xb7,
+	0xdf, 0xed, 0xed, 0xee, 0xb7, 0xb7, 0x82, 0x47, 0x19, 0xd7, 0x2b, 0xae, 0x07, 0x0b, 0xad, 0x8c,
+	0x22, 0x0f, 0xf1, 0x67, 0xaa, 0x92, 0xf0, 0x13, 0x68, 0x45, 0x3c, 0xcb, 0x84, 0x92, 0xe4, 0x09,
+	0x1c, 0xc4, 0xea, 0x3d, 0x97, 0x81, 0xd3, 0x73, 0xfa, 0x6d, 0x9a, 0x1b, 0xe1, 0x5f, 0x0d, 0x80,
+	0x11, 0x5f, 0x89, 0x29, 0x1f, 0xcb, 0x77, 0x8a, 0xf4, 0xc1, 0x7b, 0xc3, 0x52, 0x8e, 0x9c, 0xc3,
+	0xb3, 0x27, 0x83, 0x32, 0xd0, 0x20, 0xe7, 0x58, 0x1f, 0x45, 0x06, 0x09, 0xe1, 0x51, 0x8e, 0x45,
+	0x5c, 0x0b, 0x96, 0x04, 0x2e, 0x46, 0xdd, 0xc0, 0xc8, 0x29, 0x3c, 0xbe, 0x66, 0xbf, 0x89, 0x74,
+	0x99, 0x46, 0x2c, 0x5d, 0x24, 0x9c, 0x32, 0xc3, 0x83, 0x46, 0xcf, 0xe9, 0x77, 0xe9, 0xae, 0x83,
+	0xf4, 0xa0, 0x53, 0x80, 0xdf, 0x31, 0x21, 0x03, 0x0f, 0x79, 0x75, 0xa8, 0x16, 0x6f, 0xc4, 0xa7,
+	0x22, 0x65, 0x46, 0x28, 0x19, 0x1c, 0x6c, 0xc4, 0xab, 0x1c, 0xe4, 0x04, 0xfc, 0x6b, 0x21, 0x2d,
+	0x78, 0xa9, 0xf9, 0x2f, 0x4b, 0x2e, 0xa7, 0xeb, 0xa0, 0x89, 0xe4, 0x1d, 0x1c, 0xb9, 0x79, 0x80,
+	0x8a, 0xdb, 0x2a, 0xb8, 0x5b, 0x38, 0xf9, 0x14, 0xba, 0xe7, 0xa3, 0x21, 0xe5, 0x99, 0x4a, 0x96,
+	0x98, 0xc1, 0x43, 0x24, 0x6e, 0x82, 0xb5, 0x5c, 0xe9, 0x64, 0x78, 0xc7, 0xa4, 0xe4, 0x49, 0x16,
+	0xb4, 0x37, 0x72, 0xad, 0x1c, 0x35, 0x76, 0x5c, 0xb1, 0x61, 0x83, 0x5d, 0x39, 0xc2, 0x6f, 0x4b,
+	0xcd, 0xae, 0x44, 0x66, 0xc8, 0x00, 0x5a, 0xb9, 0x95, 0x05, 0x4e, 0xaf, 0xd1, 0xef, 0xec, 0xca,
+	0x66, 0xa5, 0xa5, 0x25, 0x29, 0xfc, 0xd3, 0x29, 0xa5, 0x1b, 0x2a, 0xf9, 0x4e, 0xcc, 0xc9, 0xc7,
+	0x00, 0x35, 0x7d, 0xac, 0xf4, 0x2e, 0xad, 0x21, 0xd6, 0xff, 0x76, 0xc5, 0x75, 0x86, 0x08, 0x0a,
+	0xdd, 0xa5, 0x35, 0x84, 0x3c, 0x87, 0x06, 0x9d, 0x0c, 0x51, 0xd8, 0xce, 0xd9, 0x87, 0xd5, 0xe5,
+	0x45, 0xbe, 0xf9, 0x2d, 0xd4, 0x72, 0x2c, 0x35, 0x9e, 0x0c, 0x51, 0xdb, 0xff, 0xa3, 0xc6, 0x93,
+	0x61, 0x38, 0x87, 0x4e, 0x31, 0x4c, 0xc6, 0x26, 0xd1, 0x07, 0xcf, 0x96, 0x81, 0xe9, 0xed, 0x2b,
+	0x11, 0x19, 0x64, 0x00, 0xcd, 0x3c, 0x0e, 0xa6, 0xda, 0x39, 0x7b, 0xb6, 0xcd, 0x2d, 0x6e, 0x29,
+	0x58, 0xe1, 0x3f, 0x0e, 0x74, 0x37, 0xee, 0x27, 0x7d, 0x38, 0x1a, 0x72, 0x69, 0xb8, 0xae, 0x86,
+	0x21, 0xef, 0xca, 0x36, 0x4c, 0x3e, 0x83, 0xc3, 0x37, 0x4a, 0xa7, 0x2c, 0x11, 0xbf, 0xf3, 0x19,
+	0x8e, 0xad, 0x8b, 0xc4, 0x2d, 0x94, 0x7c, 0x05, 0x4f, 0xcf, 0x25, 0x4b, 0xd4, 0xfc, 0x52, 0x24,
+	0x86, 0xeb, 0x0b, 0x26, 0x67, 0xbf, 0x8a, 0x99, 0xb9, 0xc3, 0xa6, 0xb9, 0xf4, 0x7e, 0x27, 0x79,
+	0x09, 0xcf, 0x46, 0x62, 0x2e, 0x0c, 0x4b, 0xb6, 0x8f, 0x79, 0x78, 0x6c, 0x8f, 0x97, 0x04, 0xd0,
+	0x3a, 0x97, 0x86, 0x4b, 0xc9, 0xf0, 0x75, 0xb4, 0x69, 0x69, 0x86, 0x7f, 0x38, 0xd0, 0x1c, 0xdf,
+	0x8e, 0x98, 0x61, 0xe4, 0x23, 0x68, 0xc7, 0x22, 0xe5, 0x99, 0x61, 0xe9, 0x02, 0xcb, 0xf3, 0x68,
+	0x05, 0x90, 0x53, 0x68, 0x66, 0x86, 0x99, 0x65, 0x86, 0x05, 0x6d, 0xac, 0x82, 0x08, 0xf1, 0x78,
+	0xbd, 0xe0, 0xb4, 0xe0, 0xd8, 0x0b, 0xf3, 0x79, 0xc9, 0x02, 0xaf, 0xd7, 0xe8, 0xbb, 0xb4, 0x34,
+	0xed, 0xd6, 0x79, 0xa5, 0xb5, 0xd2, 0x58, 0x68, 0x9b, 0xe6, 0x46, 0x38, 0x86, 0xd6, 0x8f, 0x5c,
+	0x97, 0x6b, 0xe9, 0x9a, 0xfd, 0xac, 0x34, 0xa6, 0xd0, 0xa5, 0xb9, 0x81, 0xa8, 0x90, 0x4a, 0x17,
+	0xd3, 0x96, 0x1b, 0x84, 0x80, 0xf7, 0x9a, 0x65, 0x77, 0xc5, 0x0a, 0xc1, 0xff, 0xe1, 0x2d, 0x1c,
+	0x46, 0xb8, 0xfb, 0xac, 0xf6, 0x58, 0x18, 0xa9, 0xed, 0xb0, 0x76, 0xb1, 0xad, 0x3e, 0xff, 0xef,
+	0xc2, 0x62, 0x28, 0x1e, 0x57, 0xf5, 0x14, 0x0e, 0x5a, 0x32, 0xc2, 0x16, 0x1c, 0xbc, 0x4a, 0x17,
+	0x66, 0x7d, 0xc2, 0xcb, 0x77, 0x86, 0x31, 0x0e, 0x01, 0x62, 0x9e, 0x99, 0x48, 0xcc, 0x25, 0x4b,
+	0xfc, 0x07, 0xd6, 0x3e, 0x17, 0x3a, 0x5b, 0xac, 0xed, 0x36, 0xf1, 0x1d, 0x02, 0xd0, 0xa4, 0xf1,
+	0x55, 0x34, 0xa2, 0xbe, 0x4b, 0x8e, 0xa0, 0x73, 0x25, 0x52, 0x1e, 0x8d, 0x28, 0x3a, 0x1b, 0x96,
+	0x5c, 0x00, 0x3f, 0x44, 0x17, 0xbe, 0x67, 0xc9, 0xaf, 0xd9, 0xf4, 0x3d, 0xbd, 0xf4, 0x0f, 0x4e,
+	0x4e, 0x01, 0xaa, 0x9e, 0x92, 0x0e, 0xb4, 0xc6, 0x72, 0xc5, 0x12, 0x31, 0xf3, 0x1f, 0x90, 0x26,
+	0xb8, 0x6f, 0xbf, 0xf7, 0x1d, 0xd2, 0x2e, 0xda, 0xe8, 0xbb, 0x67, 0x7f, 0xbb, 0xd0, 0xa1, 0x6c,
+	0x26, 0x54, 0x5e, 0x36, 0x79, 0x01, 0x1e, 0xae, 0x81, 0xa3, 0xaa, 0x22, 0xcc, 0xfe, 0x78, 0xe7,
+	0x8d, 0x20, 0xed, 0x6b, 0x68, 0xdf, 0x68, 0xb5, 0x12, 0xd8, 0xfc, 0xa7, 0xdb, 0x14, 0x7c, 0x6b,
+	0xc7, 0xb5, 0xe6, 0x94, 0x5f, 0x8f, 0x17, 0x76, 0xc9, 0x64, 0x46, 0xab, 0x35, 0xd9, 0xf5, 0x1e,
+	0x6f, 0xdf, 0x4d, 0xbe, 0x01, 0xa8, 0x54, 0xd9, 0x4d, 0x2d, 0xa8, 0x87, 0xd8, 0x10, 0xef, 0x25,
+	0x78, 0xf1, 0x52, 0x72, 0xb2, 0xe7, 0xd1, 0x1e, 0xef, 0xc1, 0x6d, 0x17, 0xe8, 0x64, 0x7c, 0x7b,
+	0x5f, 0x72, 0x7e, 0x05, 0xe5, 0xa3, 0xff, 0x85, 0x73, 0xf1, 0x1c, 0x3e, 0x10, 0x6a, 0x30, 0xd7,
+	0x8b, 0xe9, 0x40, 0xdb, 0x5e, 0xe6, 0x9f, 0xcf, 0x0b, 0xbf, 0xd6, 0xd8, 0x1b, 0x7b, 0xe8, 0xc6,
+	0xf9, 0xa9, 0x89, 0xa7, 0xbf, 0xfc, 0x37, 0x00, 0x00, 0xff, 0xff, 0x54, 0xa9, 0x72, 0xb0, 0x63,
+	0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -717,10 +743,10 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type RadioServerClient interface {
 	List(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceList, error)
-	Provision(ctx context.Context, in *DeviceInfo, opts ...grpc.CallOption) (*DeviceInfo, error)
+	Provision(ctx context.Context, in *DeviceState, opts ...grpc.CallOption) (*Session, error)
 	Destroy(ctx context.Context, in *Session, opts ...grpc.CallOption) (*Empty, error)
 	ServerInfo(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServerInfoData, error)
-	Tune(ctx context.Context, in *StreamConfig, opts ...grpc.CallOption) (*StreamConfig, error)
+	Tune(ctx context.Context, in *DeviceConfig, opts ...grpc.CallOption) (*DeviceConfig, error)
 	RXIQ(ctx context.Context, in *Session, opts ...grpc.CallOption) (RadioServer_RXIQClient, error)
 }
 
@@ -741,8 +767,8 @@ func (c *radioServerClient) List(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *radioServerClient) Provision(ctx context.Context, in *DeviceInfo, opts ...grpc.CallOption) (*DeviceInfo, error) {
-	out := new(DeviceInfo)
+func (c *radioServerClient) Provision(ctx context.Context, in *DeviceState, opts ...grpc.CallOption) (*Session, error) {
+	out := new(Session)
 	err := c.cc.Invoke(ctx, "/protocol.RadioServer/Provision", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -768,8 +794,8 @@ func (c *radioServerClient) ServerInfo(ctx context.Context, in *Empty, opts ...g
 	return out, nil
 }
 
-func (c *radioServerClient) Tune(ctx context.Context, in *StreamConfig, opts ...grpc.CallOption) (*StreamConfig, error) {
-	out := new(StreamConfig)
+func (c *radioServerClient) Tune(ctx context.Context, in *DeviceConfig, opts ...grpc.CallOption) (*DeviceConfig, error) {
+	out := new(DeviceConfig)
 	err := c.cc.Invoke(ctx, "/protocol.RadioServer/Tune", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -812,10 +838,10 @@ func (x *radioServerRXIQClient) Recv() (*IQData, error) {
 // RadioServerServer is the server API for RadioServer service.
 type RadioServerServer interface {
 	List(context.Context, *Empty) (*DeviceList, error)
-	Provision(context.Context, *DeviceInfo) (*DeviceInfo, error)
+	Provision(context.Context, *DeviceState) (*Session, error)
 	Destroy(context.Context, *Session) (*Empty, error)
 	ServerInfo(context.Context, *Empty) (*ServerInfoData, error)
-	Tune(context.Context, *StreamConfig) (*StreamConfig, error)
+	Tune(context.Context, *DeviceConfig) (*DeviceConfig, error)
 	RXIQ(*Session, RadioServer_RXIQServer) error
 }
 
@@ -826,7 +852,7 @@ type UnimplementedRadioServerServer struct {
 func (*UnimplementedRadioServerServer) List(ctx context.Context, req *Empty) (*DeviceList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (*UnimplementedRadioServerServer) Provision(ctx context.Context, req *DeviceInfo) (*DeviceInfo, error) {
+func (*UnimplementedRadioServerServer) Provision(ctx context.Context, req *DeviceState) (*Session, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Provision not implemented")
 }
 func (*UnimplementedRadioServerServer) Destroy(ctx context.Context, req *Session) (*Empty, error) {
@@ -835,7 +861,7 @@ func (*UnimplementedRadioServerServer) Destroy(ctx context.Context, req *Session
 func (*UnimplementedRadioServerServer) ServerInfo(ctx context.Context, req *Empty) (*ServerInfoData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ServerInfo not implemented")
 }
-func (*UnimplementedRadioServerServer) Tune(ctx context.Context, req *StreamConfig) (*StreamConfig, error) {
+func (*UnimplementedRadioServerServer) Tune(ctx context.Context, req *DeviceConfig) (*DeviceConfig, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Tune not implemented")
 }
 func (*UnimplementedRadioServerServer) RXIQ(req *Session, srv RadioServer_RXIQServer) error {
@@ -865,7 +891,7 @@ func _RadioServer_List_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _RadioServer_Provision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeviceInfo)
+	in := new(DeviceState)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -877,7 +903,7 @@ func _RadioServer_Provision_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/protocol.RadioServer/Provision",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RadioServerServer).Provision(ctx, req.(*DeviceInfo))
+		return srv.(RadioServerServer).Provision(ctx, req.(*DeviceState))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -919,7 +945,7 @@ func _RadioServer_ServerInfo_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _RadioServer_Tune_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StreamConfig)
+	in := new(DeviceConfig)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -931,7 +957,7 @@ func _RadioServer_Tune_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/protocol.RadioServer/Tune",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RadioServerServer).Tune(ctx, req.(*StreamConfig))
+		return srv.(RadioServerServer).Tune(ctx, req.(*DeviceConfig))
 	}
 	return interceptor(ctx, in, info, handler)
 }

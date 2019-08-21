@@ -3,6 +3,7 @@ package server
 import (
   "context"
   "fmt"
+  "github.com/racerxdl/radioserver/frontends"
 	"github.com/racerxdl/radioserver/protocol"
 	"runtime"
 	"sync"
@@ -12,10 +13,17 @@ import (
 // region GRPC Stuff
 
 func (rs *RadioServer) List(ctx context.Context, s *protocol.Empty) (*protocol.DeviceList, error) {
-  return nil, nil
+  var dl protocol.DeviceList
+
+  for _, finder := range frontends.FindDevices {
+    finder(&dl)
+  }
+
+  fmt.Println(dl.Devices)
+  return &dl, nil
 }
 
-func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceInfo) (*protocol.DeviceInfo, error) {
+func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceState) (*protocol.Session, error) {
 	rs.sessionLock.Lock()
 	defer rs.sessionLock.Unlock()
 
@@ -26,9 +34,10 @@ func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceInfo) (*
 
   rs.sessions[s.ID] = s
 	log.Info("Provisioned %s!", s.ID)
-  d.Session = s.ID
 
-	return d, nil
+	return &protocol.Session{
+    Token: s.ID,
+  }, nil
 }
 
 func (rs *RadioServer) Destroy(ctx context.Context, sid *protocol.Session) (*protocol.Empty, error) {
@@ -51,7 +60,7 @@ func (rs *RadioServer) ServerInfo(context.Context, *protocol.Empty) (*protocol.S
 	return rs.serverInfo, nil
 }
 
-func (rs *RadioServer) Tune(ctx context.Context, cc *protocol.StreamConfig) (*protocol.StreamConfig, error) {
+func (rs *RadioServer) Tune(ctx context.Context, cc *protocol.DeviceConfig) (*protocol.DeviceConfig, error) {
   return cc, nil
 }
 

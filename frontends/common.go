@@ -13,39 +13,28 @@ const (
 const minimumSampleRate = 10e3
 
 type Frontend interface {
-	GetDeviceType() protocol.DeviceType
-	GetDeviceSerial() string
-	GetUintDeviceSerial() uint32
-	GetMaximumSampleRate() uint32
-	SetSampleRate(sampleRate uint32) uint32
-	SetCenterFrequency(centerFrequency uint32) uint32
-	GetAvailableSampleRates() []uint32
+	GetDeviceInfo() protocol.DeviceInfo
+  GetDeviceConfig() protocol.DeviceConfig
+  SetDeviceConfig() protocol.DeviceConfig
+
+	Init() bool
 	Start()
 	Stop()
-	SetAntenna(value string)
-	SetAGC(agc bool)
-	SetGain(value uint8)
-	SetBiasT(value bool)
-	GetCenterFrequency() uint32
-	GetName() string
-	GetShortName() string
-	GetSampleRate() uint32
-	GetGain() uint8
-	SetSamplesAvailableCallback(cb SamplesCallback)
-	Init() bool
 	Destroy()
-	MinimumFrequency() uint32
-	MaximumFrequency() uint32
-	MaximumGainValue() uint32
-	MaximumDecimationStages() uint32
-	GetResolution() uint8
+	SetSamplesAvailableCallback(cb SamplesCallback)
 }
 
 type SamplesCallback func(samples []complex64)
-type Frontends map[string]func(*protocol.DeviceInfo) Frontend
+
+type Frontends map[string]func(*protocol.DeviceState) Frontend
+type Find map[string]func(*protocol.DeviceList)
+
+var FindDevices = Find{
+  "LimeSuite": FindLimeSuiteDevices,
+}
 
 var Available = Frontends{
-  "DeviceLimeSDR": CreateLimeSDRFrontend,
-  "DeviceAirspyOne": CreateAirspyFrontend,
+  "LimeSDRMini": CreateLimeSDRFrontend,
+//  "AirspyMini": CreateAirspyFrontend,
 }
 

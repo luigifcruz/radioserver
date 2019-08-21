@@ -53,14 +53,12 @@ const (
 
 // DeviceIds IDs
 const (
-	DeviceInvalid = iota
-	DeviceTestSignal
-	DeviceAirspyOne
-	DeviceAirspyHf
-	DeviceRtlsdr
-	DeviceLimeSDR
-	DeviceSpyServer
-	DeviceHackRF
+	TestSignal = iota
+	AirspyMini
+	RTLSDR
+	LimeSDRMini
+  LimeSDRUSB
+	HackRF
 )
 
 const (
@@ -95,26 +93,22 @@ const (
 
 // DeviceNames names of the device
 const (
-	DeviceInvalidName     = "Invalid Device"
-	DeviceTestSignalName  = "Test Signal Generator"
-	DeviceAirspyOneName   = "Airspy Mini / R2"
-	DeviceAirspyHFName    = "Airspy HF / HF+"
-	DeviceRtlsdrName      = "RTLSDR"
-	DeviceLimeSDRName     = "LimeSDR"
-	DeviceHackRFName      = "HackRF"
-	DeviceSpyserverName   = "SpyServer"
+	TestSignalName  = "Test Signal Generator"
+	AirspyMiniName  = "Airspy Mini"
+	RTLSDRName      = "RTLSDR"
+	LimeSDRMiniName = "LimeSDR"
+	LimeSDRUSBName  = "LimeSDR"
+	HackRFName      = "HackRF"
 )
 
 // DeviceName list of device names by their ids
-var DeviceName = map[uint32]string{
-	DeviceInvalid:     DeviceInvalidName,
-	DeviceTestSignal:  DeviceTestSignalName,
-	DeviceAirspyOne:   DeviceAirspyOneName,
-	DeviceAirspyHf:    DeviceAirspyHFName,
-	DeviceRtlsdr:      DeviceRtlsdrName,
-	DeviceLimeSDR:     DeviceLimeSDRName,
-	DeviceHackRF:      DeviceHackRFName,
-	DeviceSpyServer:   DeviceSpyserverName,
+var DeviceNameString = map[uint32]string{
+	TestSignal:  TestSignalName,
+	AirspyMini:  AirspyMiniName,
+	RTLSDR:      RTLSDRName,
+	LimeSDRMini: LimeSDRMiniName,
+	LimeSDRUSB:  LimeSDRUSBName,
+	HackRF:      HackRFName,
 }
 
 // SettingNames list of device names by their ids
