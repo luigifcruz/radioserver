@@ -1,9 +1,11 @@
 package frontends
 
 import (
-  "github.com/myriadrf/limedrv"
+	"strconv"
+
+	"github.com/luigifreitas/radioserver/protocol"
+	"github.com/myriadrf/limedrv"
 	"github.com/quan-to/slog"
-	"github.com/racerxdl/radioserver/protocol"
 )
 
 var limeLog = slog.Scope("LimeSDR Frontend")
@@ -12,25 +14,23 @@ type LimeSDRFrontend struct {
 	device *limedrv.LMSDevice
 	cb     SamplesCallback
 
-  info    *protocol.DeviceInfo
-  config  *protocol.DeviceConfig
-  running  bool
+	info    *protocol.DeviceInfo
+	config  *protocol.DeviceConfig
+	running bool
 }
 
 func CreateLimeSDRFrontend(state *protocol.DeviceState) Frontend {
-  devices := limedrv.GetDevices()
-	if len(devices) == 0 {
-		limeLog.Fatal("No devices found.\n")
-	}
+	devices := limedrv.GetDevices()
 
-	var device = limedrv.Open(devices[0])
+	i, _ := strconv.Atoi(state.Info.Serial)
+	var device = limedrv.Open(devices[i])
 
 	var f = &LimeSDRFrontend{
 		device:  device,
 		running: false,
-    info:    state.Info,
-    config:  state.Config,
-  }
+		info:    state.Info,
+		config:  &protocol.DeviceConfig{},
+	}
 
 	f.device.
 		SetCallback(func(samples []complex64, _ int, _ uint64) {
@@ -39,47 +39,62 @@ func CreateLimeSDRFrontend(state *protocol.DeviceState) Frontend {
 			}
 		})
 
-
-  // Global
-  f.device.SetSampleRate(float64(f.config.SampleRate), int(f.config.Oversample))
-
-  // RX CH0
-  rxCh0 := f.config.RXC
-
-	f.device.
-    RXChannels[0].
-		Enable().
-		SetLPF(float64(f.config.SampleRate)).
-		EnableLPF().
-		SetDigitalLPF(float64(f.config.SampleRate)).
-		EnableDigitalLPF().
-		SetAntennaByName(rxCh0.Antenna).
-    SetGainNormalized(float64(rxCh0.NormalizedGain)).
-    SetCenterFrequency(float64(rxCh0.CenterFrequency))
+	f.device.SetSampleRate(float64(state.Config.SampleRate), int(state.Config.Oversample))
+	f.SetDeviceConfig(*state.Config)
 
 	return f
 }
 
 func FindLimeSuiteDevices(dl *protocol.DeviceList) {
-  devices := limedrv.GetDevices()
+	devices := limedrv.GetDevices()
 
-  for _, d := range devices {
-    if d.Module == "FT601" {
-      dl.Devices = append(dl.Devices, &LimeSDRMiniDefault)
-    }
-  }
+	for i, d := range devices {
+		if d.Module == "FT601" {
+			b := LimeSDRMiniDefault
+			b.Serial = strconv.Itoa(i)
+			dl.Devices = append(dl.Devices, &b)
+		}
+	}
 }
 
 func (f *LimeSDRFrontend) GetDeviceInfo() protocol.DeviceInfo {
-  return *f.info
+	return *f.info
 }
 
 func (f *LimeSDRFrontend) GetDeviceConfig() protocol.DeviceConfig {
-  return *f.config
+	return *f.config
 }
 
-func (f *LimeSDRFrontend) SetDeviceConfig() protocol.DeviceConfig {
-  return *f.config
+func (f *LimeSDRFrontend) SetDeviceConfig(c protocol.DeviceConfig) protocol.DeviceConfig {
+
+	for i, n := range c.RXC {
+		o := &protocol.ChannelConfig{}
+		if len(f.config.RXC) > i {
+			o = f.config.RXC[i]
+		}
+
+		f.device.RXChannels[i].
+      Enable()
+//      SetLPF(float64(5e6)).
+//      EnableLPF().
+//      SetDigitalLPF(float64(5e6)).
+//      EnableDigitalLPF()
+
+		if n.NormalizedGain != o.NormalizedGain {
+			f.device.SetGainNormalized(i, true, float64(n.NormalizedGain))
+		}
+
+		if n.Antenna != o.Antenna {
+			f.device.SetAntennaByName(n.Antenna, i, true)
+		}
+
+		if n.CenterFrequency != o.CenterFrequency {
+			f.device.SetCenterFrequency(i, true, float64(n.CenterFrequency))
+			limeLog.Info("Channel %d: Tuning center frequency: %v", i, n.CenterFrequency)
+		}
+	}
+
+	return *f.config
 }
 
 func (f *LimeSDRFrontend) Start() {

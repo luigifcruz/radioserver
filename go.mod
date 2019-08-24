@@ -1,4 +1,4 @@
-module github.com/racerxdl/radioserver
+module github.com/luigifreitas/radioserver
 
 go 1.12
 

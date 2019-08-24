@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/quan-to/slog"
-  "github.com/racerxdl/radioserver"
-	"github.com/racerxdl/radioserver/server"
-	"github.com/racerxdl/segdsp/dsp"
 	"os"
 	"os/signal"
 	"runtime/debug"
 	"runtime/pprof"
 	"syscall"
+
+	"github.com/luigifreitas/radioserver"
+	"github.com/luigifreitas/radioserver/server"
+	"github.com/quan-to/slog"
+	"github.com/racerxdl/segdsp/dsp"
 )
 
 var log = slog.Scope("RadioServer")
@@ -36,9 +37,9 @@ func main() {
 		}
 	}()
 
-  serverName := "helium"
+	serverName := "helium"
 
-  log.Info("Server Name: %s", serverName)
+	log.Info("Server Name: %s", serverName)
 	log.Info("Protocol Version: %s", radioserver.ServerVersion.AsString())
 	log.Info("SIMD Mode: %s", dsp.GetSIMDMode())
 

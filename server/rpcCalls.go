@@ -1,26 +1,27 @@
 package server
 
 import (
-  "context"
-  "fmt"
-  "github.com/racerxdl/radioserver/frontends"
-	"github.com/racerxdl/radioserver/protocol"
+	"context"
+	"fmt"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/luigifreitas/radioserver/frontends"
+	"github.com/luigifreitas/radioserver/protocol"
 )
 
 // region GRPC Stuff
 
 func (rs *RadioServer) List(ctx context.Context, s *protocol.Empty) (*protocol.DeviceList, error) {
-  var dl protocol.DeviceList
+	var dl protocol.DeviceList
 
-  for _, finder := range frontends.FindDevices {
-    finder(&dl)
-  }
+	for _, finder := range frontends.FindDevices {
+		finder(&dl)
+	}
 
-  fmt.Println(dl.Devices)
-  return &dl, nil
+	fmt.Println(dl.Devices)
+	return &dl, nil
 }
 
 func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceState) (*protocol.Session, error) {
@@ -28,16 +29,16 @@ func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceState) (
 	defer rs.sessionLock.Unlock()
 
 	s := GenerateSession(d)
-  if s == nil {
-    return nil, fmt.Errorf("error provisioning")
-  }
+	if s == nil {
+		return nil, fmt.Errorf("error provisioning")
+	}
 
-  rs.sessions[s.ID] = s
+	rs.sessions[s.ID] = s
 	log.Info("Provisioned %s!", s.ID)
 
 	return &protocol.Session{
-    Token: s.ID,
-  }, nil
+		Token: s.ID,
+	}, nil
 }
 
 func (rs *RadioServer) Destroy(ctx context.Context, sid *protocol.Session) (*protocol.Empty, error) {
@@ -61,7 +62,7 @@ func (rs *RadioServer) ServerInfo(context.Context, *protocol.Empty) (*protocol.S
 }
 
 func (rs *RadioServer) Tune(ctx context.Context, cc *protocol.DeviceConfig) (*protocol.DeviceConfig, error) {
-  return cc, nil
+	return cc, nil
 }
 
 func (rs *RadioServer) RXIQ(sid *protocol.Session, server protocol.RadioServer_RXIQServer) error {
@@ -72,7 +73,7 @@ func (rs *RadioServer) RXIQ(sid *protocol.Session, server protocol.RadioServer_R
 
 	s.CG.StartIQ()
 	delete(rs.sessions, sid.Token)
-  defer s.FullStop()
+	defer s.FullStop()
 
 	lastNumSamples := 0
 	pool := sync.Pool{

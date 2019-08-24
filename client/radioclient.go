@@ -2,8 +2,9 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/quan-to/slog"
-	"github.com/racerxdl/radioserver/protocol"
+	"github.com/luigifreitas/radioserver/protocol"
 	"google.golang.org/grpc"
 )
 
@@ -22,7 +23,8 @@ type RadioClient struct {
 	conn           *grpc.ClientConn
 	client         protocol.RadioServerClient
 	serverInfo     *protocol.ServerInfoData
-	deviceInfo     *protocol.DeviceInfo
+	deviceState    *protocol.DeviceState
+  session        *protocol.Session
 
 	currentSampleRate      uint32
 	availableSampleRates   []uint32
@@ -53,11 +55,7 @@ func MakeRadioClient(address, name, application string) *RadioClient {
 
 // GetName returns the name of the active device in RadioClient
 func (f *RadioClient) GetName() string {
-	if f.deviceInfo != nil {
-		return f.deviceInfo.GetDeviceName()
-	}
-
-	return "Not Connected"
+	return f.deviceState.Info.Name.String()
 }
 
 // Start starts the streaming process (if not already started)
@@ -88,9 +86,7 @@ func (f *RadioClient) setStreamState() {
 
 func (f *RadioClient) iqLoop() {
 	ctx := context.Background()
-	iqClient, err := f.client.RXIQ(ctx, &protocol.Session{
-    Token: f.deviceInfo.Session,
-  })
+	iqClient, err := f.client.RXIQ(ctx, f.session)
 
 	if err != nil {
 		log.Fatal(err)
@@ -137,12 +133,25 @@ func (f *RadioClient) Connect() {
 		log.Fatal(err)
 	}
 
-  fmt.Println(dls.Devices)
+  i := protocol.DeviceState{
+    Info: dls.Devices[0],
+    Config: &protocol.DeviceConfig{
+      SampleRate: 3e6,
+      Oversample: 4,
+    },
+  }
 
-	log.Debug("Provisioning device.")
-	dinf, err := f.client.Provision(ctx, &protocol.DeviceInfo{
-    DeviceType: 5,
-  })
+  i.Config.RXC = append(i.Config.RXC,
+    &protocol.ChannelConfig{
+      CenterFrequency: 102.9e6,
+      NormalizedGain: 0.85,
+      Antenna: "LNAH",
+    })
+
+  deviceProv, _ := json.MarshalIndent(i, "", "   ")
+	log.Info("Provisioning Device: %s", deviceProv)
+
+  session, err := f.client.Provision(ctx, &i)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -153,7 +162,8 @@ func (f *RadioClient) Connect() {
 		log.Fatal(err)
 	}
 
-  f.deviceInfo = dinf
+  f.session = session
+  f.deviceState = &i
   f.serverInfo = sinf
 }
 
@@ -184,16 +194,12 @@ func (f *RadioClient) SetSampleRate(sampleRate uint32) uint32 {
 
 // GetCenterFrequency returns the IQ Channel Center Frequency in Hz
 func (f *RadioClient) GetCenterFrequency() uint32 {
-	return f.iqChannelConfig.CenterFrequency
+	return uint32(f.iqChannelConfig.CenterFrequency)
 }
 
 // SetCenterFrequency sets the IQ Channel Center Frequency in Hertz and returns it.
 func (f *RadioClient) SetCenterFrequency(centerFrequency uint32) uint32 {
-	if f.iqChannelConfig.CenterFrequency != centerFrequency {
-		f.iqChannelConfig.CenterFrequency = centerFrequency
-	}
-
-	return f.iqChannelConfig.CenterFrequency
+	return 0//f.iqChannelConfig.CenterFrequency
 }
 
 func (f *RadioClient) SetIQEnabled(iqEnabled bool) {
@@ -214,11 +220,7 @@ func (f *RadioClient) GetAvailableSampleRates() []uint32 {
 // The actual gain in dB varies from device to device.
 // Returns Invalid in case of a invalid value in the input
 func (f *RadioClient) SetGain(gain uint32) uint32 {
-	if f.deviceInfo == nil || gain > f.deviceInfo.MaximumGain {
-		return protocol.Invalid
-	}
 	f.gain = gain
-
 	return gain
 }
 

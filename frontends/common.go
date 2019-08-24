@@ -1,7 +1,7 @@
 package frontends
 
 import (
-  "github.com/racerxdl/radioserver/protocol"
+	"github.com/luigifreitas/radioserver/protocol"
 )
 
 const (
@@ -14,8 +14,8 @@ const minimumSampleRate = 10e3
 
 type Frontend interface {
 	GetDeviceInfo() protocol.DeviceInfo
-  GetDeviceConfig() protocol.DeviceConfig
-  SetDeviceConfig() protocol.DeviceConfig
+	GetDeviceConfig() protocol.DeviceConfig
+	SetDeviceConfig(protocol.DeviceConfig) protocol.DeviceConfig
 
 	Init() bool
 	Start()
@@ -30,11 +30,10 @@ type Frontends map[string]func(*protocol.DeviceState) Frontend
 type Find map[string]func(*protocol.DeviceList)
 
 var FindDevices = Find{
-  "LimeSuite": FindLimeSuiteDevices,
+	"LimeSuite": FindLimeSuiteDevices,
 }
 
 var Available = Frontends{
-  "LimeSDRMini": CreateLimeSDRFrontend,
-//  "AirspyMini": CreateAirspyFrontend,
+	"LimeSDRMini": CreateLimeSDRFrontend,
+	//  "AirspyMini": CreateAirspyFrontend,
 }
-

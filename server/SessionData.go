@@ -1,12 +1,13 @@
 package server
 
 import (
-	uuid2 "github.com/gofrs/uuid"
-	"github.com/racerxdl/go.fifo"
-  "github.com/racerxdl/radioserver/frontends"
-  "github.com/racerxdl/radioserver/DSP"
-	"github.com/racerxdl/radioserver/protocol"
 	"time"
+
+	uuid2 "github.com/gofrs/uuid"
+	"github.com/luigifreitas/radioserver/DSP"
+	"github.com/luigifreitas/radioserver/frontends"
+	"github.com/luigifreitas/radioserver/protocol"
+	fifo "github.com/racerxdl/go.fifo"
 )
 
 const (
@@ -15,13 +16,13 @@ const (
 )
 
 type Session struct {
-  ID         string
+	ID         string
 	LastUpdate time.Time
 
-  frontend    frontends.Frontend
+	frontend frontends.Frontend
 
-	IQFifo      *fifo.Queue
-	CG          *DSP.ChannelGenerator
+	IQFifo *fifo.Queue
+	CG     *DSP.ChannelGenerator
 
 	fullStopped bool
 }
@@ -38,12 +39,12 @@ func GenerateSession(d *protocol.DeviceState) *Session {
 		LastUpdate:  time.Now(),
 		CG:          CG,
 		fullStopped: false,
-  }
+	}
 
-  s.frontend = s.ProvisionFrontend(d)
-  if s.frontend == nil {
-    return nil
-  }
+	s.frontend = s.ProvisionFrontend(d)
+	if s.frontend == nil {
+		return nil
+	}
 
 	CG.SetOnIQ(func(samples []complex64) {
 		if s.IQFifo.Len() < maxFifoBuffs && !s.fullStopped {
@@ -52,21 +53,21 @@ func GenerateSession(d *protocol.DeviceState) *Session {
 	})
 
 	CG.Start()
-  s.frontend.Start()
+	s.frontend.Start()
 
-  return s
+	return s
 }
 
 func (s *Session) ProvisionFrontend(d *protocol.DeviceState) frontends.Frontend {
-  constructor := frontends.Available[d.Info.String()]
-  if constructor == nil {
-    return nil
-  }
+	constructor := frontends.Available[d.Info.Name.String()]
+	if constructor == nil {
+		return nil
+	}
 
-  f := constructor(d)
-  f.Init()
-  f.SetSamplesAvailableCallback(s.CG.PushSamples)
-  return f
+	f := constructor(d)
+	f.Init()
+	f.SetSamplesAvailableCallback(s.CG.PushSamples)
+	return f
 }
 
 func (s *Session) Expired() bool {
@@ -82,8 +83,8 @@ func (s *Session) IsFullStopped() bool {
 }
 
 func (s *Session) FullStop() {
-  s.frontend.Stop()
-  s.CG.StopIQ()
+	s.frontend.Stop()
+	s.CG.StopIQ()
 	s.CG.Stop()
 	s.fullStopped = true
 }

@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/quan-to/slog"
-	"github.com/racerxdl/radioserver"
-	"github.com/racerxdl/radioserver/protocol"
-	"google.golang.org/grpc"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/luigifreitas/radioserver"
+	"github.com/luigifreitas/radioserver/protocol"
+	"github.com/quan-to/slog"
+	"google.golang.org/grpc"
 )
 
 var log = slog.Scope("RadioServer")
@@ -20,15 +21,15 @@ type RadioServer struct {
 	sessionLock sync.Mutex
 	grpcServer  *grpc.Server
 
-  running bool
-  lastSessionChecks time.Time
+	running           bool
+	lastSessionChecks time.Time
 }
 
 func MakeRadioServer(serverName string) *RadioServer {
 	rs := &RadioServer{
 		serverInfo: &protocol.ServerInfoData{
 			Name: serverName,
-      Version: &protocol.Version{
+			Version: &protocol.Version{
 				Major: uint32(radioserver.ServerVersion.Major),
 				Minor: uint32(radioserver.ServerVersion.Minor),
 				Hash:  radioserver.ServerVersion.Hash,
@@ -38,7 +39,7 @@ func MakeRadioServer(serverName string) *RadioServer {
 		sessionLock: sync.Mutex{},
 	}
 
-  return rs
+	return rs
 }
 
 func (rs *RadioServer) Listen(address string) error {

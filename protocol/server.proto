@@ -21,7 +21,7 @@ message Session {
 
 message DeviceInfo {
     DeviceName Name = 1;
-    string DeviceSerial = 2;
+    string Serial = 2;
     uint32 MaximumSampleRate = 3;
     uint32 MinimumFrequency = 6;
     uint32 MaximumFrequency = 7;
@@ -37,8 +37,8 @@ message DeviceList {
 message DeviceConfig {
     float SampleRate = 1;
     uint32 Oversample = 2;
-    ChannelConfig RXC = 3;
-    ChannelConfig TXC = 4;
+    repeated ChannelConfig RXC = 3;
+    repeated ChannelConfig TXC = 4;
 }
 
 message DeviceState {

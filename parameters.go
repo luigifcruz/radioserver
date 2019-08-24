@@ -1,7 +1,7 @@
 package radioserver
 
 import (
-	"github.com/racerxdl/radioserver/protocol"
+	"github.com/luigifreitas/radioserver/protocol"
 )
 
 var ServerVersion = protocol.Version{
