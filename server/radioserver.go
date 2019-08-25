@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+  _ "google.golang.org/grpc/encoding/gzip"
 	"github.com/luigifreitas/radioserver"
 	"github.com/luigifreitas/radioserver/protocol"
 	"github.com/quan-to/slog"

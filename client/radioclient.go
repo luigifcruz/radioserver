@@ -1,11 +1,12 @@
 package client
 
 import (
-	"context"
+  "context"
 	"encoding/json"
 	"github.com/quan-to/slog"
 	"github.com/luigifreitas/radioserver/protocol"
-	"google.golang.org/grpc"
+  "google.golang.org/grpc/encoding/gzip"
+  "google.golang.org/grpc"
 )
 
 var log = slog.Scope("RadioClient")
@@ -25,7 +26,7 @@ type RadioClient struct {
 	serverInfo     *protocol.ServerInfoData
 	deviceState    *protocol.DeviceState
   session        *protocol.Session
-
+  ctx            context.Context
 	currentSampleRate      uint32
 	availableSampleRates   []uint32
 
@@ -47,7 +48,8 @@ func MakeRadioClient(address, name, application string) *RadioClient {
 		iqChannelConfig:       &protocol.ChannelConfig{},
 		iqChannelEnabled:      false,
 		streaming:             false,
-    currentSampleRate: 3000000,
+    currentSampleRate:     600000,
+    ctx:                   context.Background(),
   }
 }
 
@@ -85,8 +87,7 @@ func (f *RadioClient) setStreamState() {
 }
 
 func (f *RadioClient) iqLoop() {
-	ctx := context.Background()
-	iqClient, err := f.client.RXIQ(ctx, f.session)
+	iqClient, err := f.client.RXIQ(f.ctx, f.session)
 
 	if err != nil {
 		log.Fatal(err)
@@ -116,6 +117,7 @@ func (f *RadioClient) Connect() {
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
+  opts = append(opts, grpc.WithDefaultCallOptions(grpc.UseCompressor(gzip.Name)))
 	conn, err := grpc.Dial(f.address, opts...)
 
 	if err != nil {
@@ -125,10 +127,9 @@ func (f *RadioClient) Connect() {
 	f.conn = conn
 
 	f.client = protocol.NewRadioServerClient(conn)
-	ctx := context.Background()
 
   log.Debug("Connected, listing devices.")
-	dls, err := f.client.List(ctx, &protocol.Empty{})
+	dls, err := f.client.List(f.ctx, &protocol.Empty{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -136,35 +137,51 @@ func (f *RadioClient) Connect() {
   i := protocol.DeviceState{
     Info: dls.Devices[0],
     Config: &protocol.DeviceConfig{
-      SampleRate: 3e6,
-      Oversample: 4,
+      SampleRate: float32(f.currentSampleRate),
+      Oversample: 16,
     },
   }
 
   i.Config.RXC = append(i.Config.RXC,
     &protocol.ChannelConfig{
-      CenterFrequency: 102.9e6,
-      NormalizedGain: 0.85,
-      Antenna: "LNAH",
+      CenterFrequency: 96.9e6,
+      NormalizedGain: 0.5,
+      Antenna: "LNAW",
     })
 
   deviceProv, _ := json.MarshalIndent(i, "", "   ")
 	log.Info("Provisioning Device: %s", deviceProv)
 
-  session, err := f.client.Provision(ctx, &i)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Debug("Fetching server info")
-	sinf, err := f.client.ServerInfo(ctx, &protocol.Empty{})
+  session, err := f.client.Provision(f.ctx, &i)
 	if err != nil {
 		log.Fatal(err)
 	}
 
   f.session = session
   f.deviceState = &i
+
+	log.Debug("Fetching server info")
+	sinf, err := f.client.ServerInfo(f.ctx, &protocol.Empty{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
   f.serverInfo = sinf
+}
+
+func (f *RadioClient) ChangeFrequency(cf float32) {
+  f.deviceState.Config.RXC[0].CenterFrequency = cf
+
+  deviceProv, _ := json.MarshalIndent(f.deviceState, "", "   ")
+	log.Info("Retuning Device: %s", deviceProv)
+
+  _, err := f.client.Tune(f.ctx, &protocol.DeviceTune{
+    Session: f.session,
+    Config: f.deviceState.Config,
+  })
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Disconnect disconnects from current connected RadioClient.

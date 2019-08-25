@@ -46,6 +46,11 @@ message DeviceState {
     DeviceConfig Config = 2;
 }
 
+message DeviceTune {
+    Session Session = 1;
+    DeviceConfig Config = 2;
+}
+
 message ChannelConfig {
     float CenterFrequency = 1;
     float NormalizedGain = 2;
@@ -93,6 +98,6 @@ service RadioServer {
     rpc Provision(DeviceState) returns (Session);
     rpc Destroy(Session) returns (Empty);
     rpc ServerInfo(Empty) returns (ServerInfoData);
-    rpc Tune(DeviceConfig) returns (DeviceConfig);
+    rpc Tune(DeviceTune) returns (DeviceConfig);
     rpc RXIQ(Session) returns (stream IQData);
 }

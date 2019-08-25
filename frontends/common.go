@@ -15,7 +15,7 @@ const minimumSampleRate = 10e3
 type Frontend interface {
 	GetDeviceInfo() protocol.DeviceInfo
 	GetDeviceConfig() protocol.DeviceConfig
-	SetDeviceConfig(protocol.DeviceConfig) protocol.DeviceConfig
+	SetDeviceConfig(*protocol.DeviceConfig) protocol.DeviceConfig
 
 	Init() bool
 	Start()

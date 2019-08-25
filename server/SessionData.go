@@ -70,6 +70,10 @@ func (s *Session) ProvisionFrontend(d *protocol.DeviceState) frontends.Frontend 
 	return f
 }
 
+func (s *Session) TuneFrontend(c *protocol.DeviceConfig) {
+  s.frontend.SetDeviceConfig(c)
+}
+
 func (s *Session) Expired() bool {
 	return time.Since(s.LastUpdate) > expirationTime
 }

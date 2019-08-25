@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"sync"
 	"time"
-
 	"github.com/luigifreitas/radioserver/frontends"
 	"github.com/luigifreitas/radioserver/protocol"
 )
@@ -20,7 +19,6 @@ func (rs *RadioServer) List(ctx context.Context, s *protocol.Empty) (*protocol.D
 		finder(&dl)
 	}
 
-	fmt.Println(dl.Devices)
 	return &dl, nil
 }
 
@@ -33,7 +31,7 @@ func (rs *RadioServer) Provision(ctx context.Context, d *protocol.DeviceState) (
 		return nil, fmt.Errorf("error provisioning")
 	}
 
-	rs.sessions[s.ID] = s
+  rs.sessions[s.ID] = s
 	log.Info("Provisioned %s!", s.ID)
 
 	return &protocol.Session{
@@ -47,7 +45,7 @@ func (rs *RadioServer) Destroy(ctx context.Context, sid *protocol.Session) (*pro
 
 	s := rs.sessions[sid.Token]
 	if s == nil {
-		return nil, fmt.Errorf("not logged in")
+		return nil, fmt.Errorf("session doesn't exist")
 	}
 
 	delete(rs.sessions, sid.Token)
@@ -61,8 +59,14 @@ func (rs *RadioServer) ServerInfo(context.Context, *protocol.Empty) (*protocol.S
 	return rs.serverInfo, nil
 }
 
-func (rs *RadioServer) Tune(ctx context.Context, cc *protocol.DeviceConfig) (*protocol.DeviceConfig, error) {
-	return cc, nil
+func (rs *RadioServer) Tune(ctx context.Context, dt *protocol.DeviceTune) (*protocol.DeviceConfig, error) {
+  s := rs.sessions[dt.Session.Token]
+	if s == nil {
+		return nil, fmt.Errorf("session doesn't exist")
+	}
+
+  s.TuneFrontend(dt.Config)
+  return dt.Config, nil
 }
 
 func (rs *RadioServer) RXIQ(sid *protocol.Session, server protocol.RadioServer_RXIQServer) error {
@@ -72,7 +76,7 @@ func (rs *RadioServer) RXIQ(sid *protocol.Session, server protocol.RadioServer_R
 	}
 
 	s.CG.StartIQ()
-	delete(rs.sessions, sid.Token)
+  defer delete(rs.sessions, sid.Token)
 	defer s.FullStop()
 
 	lastNumSamples := 0

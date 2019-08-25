@@ -2,8 +2,8 @@ package frontends
 
 import (
 	"strconv"
-
-	"github.com/luigifreitas/radioserver/protocol"
+  "time"
+  "github.com/luigifreitas/radioserver/protocol"
 	"github.com/myriadrf/limedrv"
 	"github.com/quan-to/slog"
 )
@@ -40,7 +40,13 @@ func CreateLimeSDRFrontend(state *protocol.DeviceState) Frontend {
 		})
 
 	f.device.SetSampleRate(float64(state.Config.SampleRate), int(state.Config.Oversample))
-	f.SetDeviceConfig(*state.Config)
+
+  for i, _ := range state.Config.RXC {
+      limeLog.Info("Channel %d: Activating Channel.", i)
+      f.device.RXChannels[i].Enable()
+  }
+
+  f.SetDeviceConfig(state.Config)
 
 	return f
 }
@@ -65,27 +71,24 @@ func (f *LimeSDRFrontend) GetDeviceConfig() protocol.DeviceConfig {
 	return *f.config
 }
 
-func (f *LimeSDRFrontend) SetDeviceConfig(c protocol.DeviceConfig) protocol.DeviceConfig {
+func (f *LimeSDRFrontend) SetDeviceConfig(c *protocol.DeviceConfig) protocol.DeviceConfig {
 
 	for i, n := range c.RXC {
 		o := &protocol.ChannelConfig{}
-		if len(f.config.RXC) > i {
-			o = f.config.RXC[i]
-		}
 
-		f.device.RXChannels[i].
-      Enable()
-//      SetLPF(float64(5e6)).
-//      EnableLPF().
-//      SetDigitalLPF(float64(5e6)).
-//      EnableDigitalLPF()
+    if len(f.config.RXC) > i {
+      limeLog.Info("Loading configuration.")
+			o = f.config.RXC[i]
+    }
 
 		if n.NormalizedGain != o.NormalizedGain {
 			f.device.SetGainNormalized(i, true, float64(n.NormalizedGain))
+			limeLog.Info("Channel %d: Tuning normalized gain: %v", i, n.NormalizedGain)
 		}
 
 		if n.Antenna != o.Antenna {
 			f.device.SetAntennaByName(n.Antenna, i, true)
+			limeLog.Info("Channel %d: Tuning antenna: %v", i, n.Antenna)
 		}
 
 		if n.CenterFrequency != o.CenterFrequency {
@@ -94,6 +97,7 @@ func (f *LimeSDRFrontend) SetDeviceConfig(c protocol.DeviceConfig) protocol.Devi
 		}
 	}
 
+  f.config = c
 	return *f.config
 }
 
@@ -109,7 +113,9 @@ func (f *LimeSDRFrontend) Stop() {
 	if f.running {
 		limeLog.Info("Stopping")
 		f.device.Stop()
-		f.running = false
+    time.Sleep(time.Second)
+    f.device.Close()
+    f.running = false
 	}
 }
 
